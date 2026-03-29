@@ -318,48 +318,141 @@
   }
 
   .booster-card {
-    background: linear-gradient(145deg, var(--surface2), var(--surface3));
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px 20px 20px;
+    background: linear-gradient(160deg, #16162a, #1e1e38, #16162a);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 20px;
+    padding: 28px 20px 22px;
     text-align: center;
-    width: 220px;
+    width: 240px;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
   }
 
+  /* Fond ambiance dorée animée */
   .booster-card::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(201,168,76,0.06), transparent);
-    opacity: 0;
-    transition: opacity 0.3s;
+    inset: -2px;
+    border-radius: 22px;
+    background: conic-gradient(
+      from var(--angle, 0deg),
+      transparent 0deg,
+      rgba(201,168,76,0.15) 60deg,
+      rgba(240,208,128,0.25) 120deg,
+      rgba(201,168,76,0.15) 180deg,
+      transparent 240deg,
+      transparent 360deg
+    );
+    animation: border-spin 4s linear infinite;
+    z-index: 0;
   }
 
-  .booster-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(201,168,76,0.2); }
-  .booster-card:hover::before { opacity: 1; }
+  /* Fond masque pour cacher le conic-gradient sauf le bord */
+  .booster-card::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 18px;
+    background: linear-gradient(160deg, #16162a, #1e1e38, #16162a);
+    z-index: 1;
+  }
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  @keyframes border-spin {
+    to { --angle: 360deg; }
+  }
+
+  .booster-card:hover {
+    transform: translateY(-12px) scale(1.03);
+    box-shadow: 0 28px 60px rgba(0,0,0,0.6), 0 0 40px rgba(201,168,76,0.25);
+    border-color: rgba(201,168,76,0.6);
+  }
+
+  /* Tout le contenu de la carte doit être au-dessus du pseudo-border */
+  .booster-card > * { position: relative; z-index: 2; }
 
   .booster-img-wrap {
-    width: 130px;
-    height: 180px;
-    margin: 0 auto 16px;
-    border-radius: 10px;
+    width: 155px;
+    height: 250px;
+    margin: 0 auto 18px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     position: relative;
+    box-shadow:
+      0 12px 35px rgba(0,0,0,0.7),
+      0 0 0 1px rgba(201,168,76,0.3),
+      inset 0 0 20px rgba(0,0,0,0.3);
   }
 
   .booster-img-wrap img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s;
+    object-position: center;
+    transition: transform 0.5s ease;
+    display: block;
   }
 
-  .booster-card:hover .booster-img-wrap img { transform: scale(1.05); }
+  .booster-card:hover .booster-img-wrap img { transform: scale(1.06); }
+
+  /* Reflet lumineux qui balaie en boucle */
+  .booster-img-wrap::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -60%;
+    width: 50%;
+    height: 300%;
+    background: linear-gradient(
+      105deg,
+      transparent 20%,
+      rgba(255,255,255,0.04) 35%,
+      rgba(255,255,255,0.18) 50%,
+      rgba(240,208,128,0.12) 55%,
+      rgba(255,255,255,0.04) 65%,
+      transparent 80%
+    );
+    animation: shine-sweep 3.5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 3;
+    transform: skewX(-15deg);
+  }
+
+  @keyframes shine-sweep {
+    0%   { left: -60%; opacity: 0; }
+    10%  { opacity: 1; }
+    50%  { left: 130%; opacity: 1; }
+    55%  { opacity: 0; }
+    100% { left: 130%; opacity: 0; }
+  }
+
+  /* Particules de brillance aux coins */
+  .booster-img-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 15% 15%, rgba(201,168,76,0.2) 0%, transparent 40%),
+      radial-gradient(ellipse at 85% 85%, rgba(155,89,182,0.15) 0%, transparent 40%);
+    animation: holo-shift 5s ease-in-out infinite alternate;
+    z-index: 2;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  @keyframes holo-shift {
+    0%   { opacity: 0.5; background-position: 0% 0%; }
+    50%  { opacity: 1; }
+    100% { opacity: 0.5; background-position: 100% 100%; }
+  }
 
   .booster-img-placeholder {
     width: 100%;
@@ -368,7 +461,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
+    font-size: 48px;
     color: var(--gold);
   }
 
@@ -405,109 +498,417 @@
 
   .btn-open-booster:hover { box-shadow: 0 6px 20px rgba(201,168,76,0.4); filter: brightness(1.1); }
 
-  /* ===== BOOSTER OPENING ANIMATION ===== */
+  /* ===== BOOSTER SELECTION ===== */
+  .booster-card.selected {
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.35), 0 28px 60px rgba(0,0,0,0.6) !important;
+    transform: translateY(-12px) scale(1.03) !important;
+  }
+
+  .booster-card.selected::before { animation-duration: 1.5s !important; }
+
+  /* ===== BOOSTER OPENING OVERLAY ===== */
   #booster-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.92);
+    background: radial-gradient(ellipse at center, #0d0d20 0%, #050508 100%);
     z-index: 500;
     display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 24px;
+    gap: 0;
+    transition: background 1.2s ease;
+    overflow: hidden;
   }
 
   #booster-overlay.active { display: flex; }
+
+  /* Fond aurora arc-en-ciel quand le booster contient une rare */
+  #booster-overlay.has-rare {
+    background: radial-gradient(ellipse at center, #0d0d20 0%, #050508 100%);
+  }
+
+  #aurora-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 2s ease;
+    background:
+      radial-gradient(ellipse at 20% 60%, rgba(138,43,226,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 40%, rgba(0,200,180,0.14) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(255,100,50,0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 30% 20%, rgba(50,150,255,0.14) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 70%, rgba(255,200,0,0.10) 0%, transparent 45%);
+    animation: aurora-shift 6s ease-in-out infinite alternate;
+  }
+
+  #aurora-layer.visible { opacity: 1; }
+
+  @keyframes aurora-shift {
+    0%   { filter: hue-rotate(0deg) brightness(1); }
+    50%  { filter: hue-rotate(40deg) brightness(1.15); }
+    100% { filter: hue-rotate(-30deg) brightness(0.95); }
+  }
+
+  /* Canvas particules */
+  #particle-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+
+  #particle-canvas.visible { opacity: 1; }
+
+  /* Tout le contenu de l'overlay au-dessus des effets */
+  #reveal-step, #recap-step { position: relative; z-index: 2; }
+
+  .reveal-counter {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: rgba(201,168,76,0.45);
+    text-transform: uppercase;
+  }
+  .single-reveal-wrap {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    width: 248px;
+    height: 347px;
+  }
+
+  .single-card {
+    width: 248px;
+    height: 347px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid rgba(201,168,76,0.4);
+    box-shadow: 0 0 40px rgba(201,168,76,0.2), 0 20px 60px rgba(0,0,0,0.7);
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 10;
+  }
+
+  .single-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .single-card .card-img-placeholder {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    background: linear-gradient(135deg, var(--surface2), var(--surface3));
+  }
+
+  .single-card .card-img-placeholder .card-type-icon { font-size: 48px; }
+  .single-card .card-img-placeholder .card-num { font-size: 12px; color: var(--gold); font-family: 'Cinzel', serif; letter-spacing: 2px; }
+
+  /* Animation entrée depuis le bas */
+  @keyframes card-slide-in {
+    from { opacity: 0; transform: translateY(60px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Animation sortie vers le haut */
+  @keyframes card-slide-out {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(-120%) scale(0.95); }
+  }
+
+  .single-card.entering {
+    animation: card-slide-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  .single-card.leaving {
+    animation: card-slide-out 0.3s ease-in forwards;
+    pointer-events: none;
+  }
+
+  /* Brillance derrière la carte rare — box-shadow sur le wrap */
+  .single-reveal-wrap.rare-glow {
+    animation: rare-pulse 2s ease-in-out infinite;
+    border-radius: 14px;
+  }
+
+  @keyframes rare-pulse {
+    0%,100% {
+      box-shadow:
+        0 0 30px 10px rgba(255,200,50,0.4),
+        0 0 70px 25px rgba(180,80,255,0.25),
+        0 0 120px 45px rgba(50,180,255,0.16);
+      filter: hue-rotate(0deg);
+    }
+    50% {
+      box-shadow:
+        0 0 45px 16px rgba(255,200,50,0.6),
+        0 0 95px 38px rgba(180,80,255,0.36),
+        0 0 160px 65px rgba(50,180,255,0.24);
+      filter: hue-rotate(40deg);
+    }
+  }
+
+  /* Le conteneur doit permettre le overflow pour le glow */
+  .single-reveal-wrap { overflow: visible; }
+
+  .single-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .single-card .card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    background: linear-gradient(135deg, var(--surface2), var(--surface3));
+  }
+
+  .single-card .card-img-placeholder .card-type-icon { font-size: 48px; }
+  .single-card .card-img-placeholder .card-num { font-size: 12px; color: var(--gold); font-family: 'Cinzel', serif; letter-spacing: 2px; }
+
+  /* Animation entrée depuis le bas */
+  @keyframes card-slide-in {
+    from { opacity: 0; transform: translateY(60px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Animation sortie vers le haut */
+  @keyframes card-slide-out {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(-120%) scale(0.95); }
+  }
+
+  .single-card.entering {
+    animation: card-slide-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  .single-card.leaving {
+    animation: card-slide-out 0.3s ease-in forwards;
+    pointer-events: none;
+  }
+
+  /* Hint clique */
+  .reveal-hint {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    opacity: 0.7;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .reveal-hint.hidden { opacity: 0; pointer-events: none; }
+
+  /* Récap grille */
+  .recap-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .recap-card {
+    width: 86px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid rgba(201,168,76,0.3);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    animation: card-slide-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    background: var(--surface2);
+  }
+
+  .recap-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* ===== EFFET BRILLANT ===== */
+  .shiny-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    /* Fond holographique permanent */
+    background:
+      linear-gradient(
+        125deg,
+        rgba(255,80,80,0.07) 0%,
+        rgba(255,200,50,0.09) 20%,
+        rgba(80,255,120,0.07) 40%,
+        rgba(50,180,255,0.09) 60%,
+        rgba(180,80,255,0.07) 80%,
+        rgba(255,80,150,0.07) 100%
+      );
+    animation: holo-base 5s linear infinite;
+    z-index: 2;
+  }
+
+  /* Sweep lumineux par-dessus */
+  .shiny-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      105deg,
+      transparent 15%,
+      rgba(255,255,255,0.06) 30%,
+      rgba(255,255,255,0.38) 48%,
+      rgba(240,208,128,0.22) 53%,
+      rgba(180,100,255,0.15) 58%,
+      rgba(50,200,255,0.10) 63%,
+      rgba(255,255,255,0.06) 72%,
+      transparent 85%
+    );
+    animation: shine-sweep 2.8s ease-in-out infinite;
+  }
+
+  @keyframes holo-base {
+    0%   { filter: hue-rotate(0deg); opacity: 0.85; }
+    50%  { filter: hue-rotate(180deg); opacity: 1; }
+    100% { filter: hue-rotate(360deg); opacity: 0.85; }
+  }
+
+  /* Bordure arc-en-ciel sur les cartes brillantes (collection) */
+  .coll-card.shiny img,
+  .coll-card.shiny .card-placeholder {
+    border-color: transparent !important;
+    box-shadow:
+      0 0 0 2px rgba(255,200,80,0.7),
+      0 0 8px 2px rgba(180,80,255,0.4),
+      0 0 14px 4px rgba(50,180,255,0.25) !important;
+  }
+
+  /* Badge brillant */
+  .shiny-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 11px;
+    filter: drop-shadow(0 0 3px rgba(255,220,80,0.8));
+    line-height: 1;
+  }
+
+  /* ===== MODAL CARTE ===== */
+  #card-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 600;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.2s ease;
+  }
+
+  #card-modal.active { display: flex; }
+
+  .modal-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+  }
+
+  .modal-card-wrap {
+    position: relative;
+    width: 248px;
+    height: 347px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid rgba(201,168,76,0.4);
+    box-shadow: 0 0 40px rgba(201,168,76,0.15), 0 20px 60px rgba(0,0,0,0.7);
+  }
+
+  .modal-card-wrap.shiny-modal {
+    border-color: transparent;
+    box-shadow:
+      0 0 0 2px rgba(255,200,80,0.7),
+      0 0 20px 6px rgba(180,80,255,0.35),
+      0 0 40px 12px rgba(50,180,255,0.2),
+      0 20px 60px rgba(0,0,0,0.7);
+  }
+
+  .modal-card-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+
+  .modal-card-wrap .shiny-overlay { border-radius: 12px; }
+
+  .modal-counts {
+    display: flex;
+    gap: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .modal-counts span { display: flex; align-items: center; gap: 6px; }
+  .modal-counts b { color: var(--gold); font-size: 16px; }
+
+  .modal-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .modal-toggle-btn {
+    padding: 8px 18px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border: none;
+    background: var(--surface2);
+    color: var(--text-muted);
+    transition: all 0.25s;
+  }
+
+  .modal-toggle-btn.active { background: rgba(201,168,76,0.2); color: var(--gold); }
+  .modal-toggle-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .recap-card .card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    background: linear-gradient(135deg, var(--surface2), var(--surface3));
+    font-size: 9px;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+  }
 
   .reveal-title {
     font-family: 'Cinzel Decorative', serif;
     font-size: 24px;
     color: var(--gold);
     text-shadow: 0 0 30px rgba(201,168,76,0.6);
-    animation: pulse 1.5s ease-in-out infinite;
     letter-spacing: 3px;
   }
-
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
-
-  .cards-reveal-row {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 900px;
-    padding: 0 20px;
-  }
-
-  .reveal-card {
-    width: var(--card-w);
-    height: var(--card-h);
-    border-radius: var(--radius);
-    cursor: pointer;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.6s;
-    perspective: 600px;
-  }
-
-  .reveal-card.flipped { transform: rotateY(180deg); }
-
-  .card-face {
-    position: absolute;
-    inset: 0;
-    border-radius: var(--radius);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    overflow: hidden;
-  }
-
-  .card-back {
-    background: linear-gradient(135deg, #1a1a35, #2a2a50);
-    border: 2px solid var(--gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 11px;
-    color: var(--gold);
-    text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-  }
-
-  .card-back::before {
-    content: '✦';
-    position: absolute;
-    font-size: 40px;
-    color: rgba(201,168,76,0.1);
-  }
-
-  .card-front {
-    transform: rotateY(180deg);
-    border: 2px solid var(--gold);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-  }
-
-  .card-front img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .card-front .card-img-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, var(--surface3), var(--surface2));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 4px;
-    padding: 6px;
-  }
-
-  .card-front .card-img-placeholder .card-type-icon { font-size: 24px; }
-  .card-front .card-img-placeholder .card-num { font-size: 9px; color: var(--gold); font-family: 'Cinzel', serif; }
 
   .btn-collect {
     background: linear-gradient(135deg, var(--gold-dark), var(--gold));
@@ -521,10 +922,8 @@
     letter-spacing: 2px;
     cursor: pointer;
     transition: all 0.3s;
-    display: none;
   }
 
-  .btn-collect.visible { display: block; }
   .btn-collect:hover { box-shadow: 0 8px 25px rgba(201,168,76,0.4); transform: translateY(-2px); }
 
   /* ===== FILTER BAR ===== */
@@ -664,80 +1063,122 @@
   .empty-state p { font-size: 13px; line-height: 1.6; }
 
   /* ===== DECK TAB ===== */
+  #tab-deck { padding-right: 320px; } /* espace pour le panneau fixe */
+
   .deck-layout {
-    display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 24px;
-    max-width: 1100px;
+    max-width: 800px;
     margin: 0 auto;
-    align-items: start;
   }
 
-  .deck-panel {
-    background: linear-gradient(145deg, var(--surface2), var(--surface));
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
+  /* Panneau deck fixe à droite, sous header+nav */
+  #deck-fixed-panel {
+    display: none;
+    position: fixed;
+    top: 121px; /* header 64 + nav 57 */
+    right: 0;
+    width: 300px;
+    height: calc(100vh - 121px);
+    background: linear-gradient(180deg, rgba(17,17,34,0.97), rgba(10,10,20,0.97));
+    border-left: 1px solid var(--border);
+    padding: 16px 14px;
+    z-index: 90;
+    overflow-y: auto;
+    backdrop-filter: blur(20px);
+  }
+
+  #tab-deck.active ~ * #deck-fixed-panel,
+  body.deck-active #deck-fixed-panel { display: block; }
+
+  .deck-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 8px;
   }
 
   .deck-panel-title {
     font-family: 'Cinzel', serif;
-    font-size: 14px;
+    font-size: 12px;
     color: var(--gold);
     letter-spacing: 2px;
-    margin-bottom: 16px;
     text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Sélecteur de deck */
+  .deck-selector { display: flex; gap: 4px; }
+
+  .deck-selector-btn {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 11px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .deck-selector-btn.active {
+    background: rgba(201,168,76,0.2);
+    border-color: var(--gold);
+    color: var(--gold);
   }
 
   .deck-slots {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 8px;
-    min-height: 160px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 12px;
   }
 
   .deck-slot {
-    width: 80px;
-    height: 112px;
-    border: 2px dashed rgba(201,168,76,0.2);
-    border-radius: 8px;
+    width: 100%;
+    aspect-ratio: 495 / 692;
+    border: 1px dashed rgba(201,168,76,0.18);
+    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-    color: rgba(201,168,76,0.15);
+    font-size: 12px;
+    color: rgba(201,168,76,0.1);
     position: relative;
-    transition: border-color 0.3s;
   }
 
   .deck-slot.filled { border: none; }
-  .deck-slot.filled img {
-    width: 80px;
-    height: 112px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 2px solid var(--border);
-    display: block;
-    cursor: pointer;
-    transition: filter 0.3s;
+
+  .deck-card-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 495 / 692;
   }
 
-  .deck-slot.filled img:hover { filter: brightness(0.7); }
-  .deck-slot.filled .slot-placeholder { width: 80px; height: 112px; }
+  .deck-card-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    display: block;
+    cursor: pointer;
+    transition: filter 0.2s;
+  }
 
-  .deck-card-wrap { position: relative; }
+  .deck-card-wrap:hover img { filter: brightness(0.6); }
 
   .deck-remove-btn {
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: -5px; right: -5px;
     background: var(--danger);
     border: none;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 15px; height: 15px;
     color: white;
-    font-size: 11px;
+    font-size: 8px;
     cursor: pointer;
     display: none;
     align-items: center;
@@ -749,19 +1190,16 @@
 
   .deck-count-info {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
+    gap: 8px;
+    margin-bottom: 10px;
   }
 
   .deck-count-bar {
-    height: 6px;
+    height: 4px;
     background: var(--surface3);
     border-radius: 3px;
     flex: 1;
-    margin: 0 12px;
     overflow: hidden;
   }
 
@@ -772,64 +1210,89 @@
     transition: width 0.4s;
   }
 
-  .deck-count-text { font-size: 13px; color: var(--gold); font-family: 'Cinzel', serif; font-weight: 600; }
-
-  .coll-card.in-deck img, .coll-card.in-deck .card-placeholder { border-color: var(--gold) !important; box-shadow: 0 0 10px rgba(201,168,76,0.3); }
-
-  .coll-card .add-to-deck-btn {
-    position: absolute;
-    bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--gold);
-    color: var(--deep);
-    border: none;
-    border-radius: 12px;
-    padding: 3px 10px;
-    font-size: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    display: none;
-    white-space: nowrap;
+  .deck-count-text {
+    font-size: 11px;
+    color: var(--gold);
     font-family: 'Cinzel', serif;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    white-space: nowrap;
   }
-
-  .coll-card:hover .add-to-deck-btn { display: block; }
-  .coll-card.maxed .add-to-deck-btn { background: var(--text-muted); cursor: not-allowed; }
 
   .btn-save-deck {
     background: linear-gradient(135deg, var(--gold-dark), var(--gold));
     border: none;
-    border-radius: 10px;
-    padding: 12px 24px;
+    border-radius: 8px;
+    padding: 9px 14px;
     color: var(--deep);
     font-family: 'Cinzel', serif;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 1.5px;
     cursor: pointer;
     transition: all 0.3s;
     width: 100%;
-    margin-top: 16px;
   }
 
-  .btn-save-deck:hover { box-shadow: 0 6px 20px rgba(201,168,76,0.4); filter: brightness(1.1); }
-  .btn-save-deck:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-save-deck:hover { box-shadow: 0 4px 16px rgba(201,168,76,0.4); filter: brightness(1.1); }
+
+  /* Bouton ajouter au deck avec toggle shiny */
+  .coll-card.in-deck img, .coll-card.in-deck .card-placeholder {
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 10px rgba(201,168,76,0.3);
+  }
+
+  .coll-card .deck-add-wrap {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+  }
+
+  .coll-card:hover .deck-add-wrap { display: flex; }
+
+  .add-to-deck-btn {
+    background: var(--gold);
+    color: var(--deep);
+    border: none;
+    border-radius: 10px;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.5px;
+    display: block;
+  }
+
+  .add-to-deck-btn.shiny-btn {
+    background: linear-gradient(90deg, #f0d080, #c060ff, #50c8ff, #f0d080);
+    background-size: 200% 100%;
+    animation: shiny-btn-shift 2s linear infinite;
+    color: var(--deep);
+  }
+
+  @keyframes shiny-btn-shift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+
+  .add-to-deck-btn.disabled-btn { background: var(--text-muted); cursor: not-allowed; }
+
+  .coll-card.maxed .add-to-deck-btn { background: var(--text-muted); cursor: not-allowed; }
 
   /* ===== COMBAT TAB ===== */
-  .combat-center {
-    max-width: 600px;
-    margin: 0 auto;
-    text-align: center;
-  }
+  .combat-center { max-width: 500px; margin: 0 auto; }
 
   .combat-box {
     background: linear-gradient(145deg, var(--surface2), var(--surface));
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 40px 32px;
-    margin-bottom: 24px;
+    padding: 32px 28px;
     position: relative;
     overflow: hidden;
   }
@@ -837,75 +1300,30 @@
   .combat-box::before {
     content: '⚔';
     position: absolute;
-    font-size: 120px;
+    font-size: 100px;
     color: rgba(201,168,76,0.04);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
     pointer-events: none;
   }
 
-  .combat-title {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 20px;
-    color: var(--gold);
-    margin-bottom: 8px;
-  }
+  .combat-title { font-family: 'Cinzel Decorative', serif; font-size: 18px; color: var(--gold); margin-bottom: 6px; text-align: center; }
+  .combat-subtitle { color: var(--text-muted); font-size: 12px; margin-bottom: 24px; line-height: 1.6; text-align: center; }
 
-  .combat-subtitle {
-    color: var(--text-muted);
-    font-size: 13px;
-    margin-bottom: 28px;
-    line-height: 1.6;
-  }
-
-  .combat-code-display {
-    background: var(--surface3);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 24px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .your-code-label { font-size: 11px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
-  .your-code-value { font-family: 'Cinzel', serif; font-size: 22px; color: var(--gold); letter-spacing: 4px; font-weight: 700; }
-
-  .btn-copy {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 14px;
-    color: var(--text-muted);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .btn-copy:hover { border-color: var(--gold); color: var(--gold); }
-
-  .combat-enter {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
+  .combat-enter { display: flex; gap: 10px; align-items: center; }
 
   .combat-enter input {
     flex: 1;
     background: var(--surface3);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 14px 16px;
+    padding: 13px 16px;
     color: var(--text);
     font-family: 'Cinzel', serif;
-    font-size: 18px;
-    letter-spacing: 4px;
+    font-size: 16px;
+    letter-spacing: 3px;
     outline: none;
     text-align: center;
-    text-transform: uppercase;
     transition: border-color 0.3s;
   }
 
@@ -913,17 +1331,10 @@
 
   .btn-duel {
     background: linear-gradient(135deg, #8b0000, var(--danger));
-    border: none;
-    border-radius: 8px;
-    padding: 14px 24px;
-    color: white;
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.3s;
-    white-space: nowrap;
+    border: none; border-radius: 8px; padding: 13px 20px;
+    color: white; font-family: 'Cinzel', serif; font-size: 13px;
+    font-weight: 700; letter-spacing: 1px; cursor: pointer;
+    transition: all 0.3s; white-space: nowrap;
   }
 
   .btn-duel:hover { box-shadow: 0 6px 20px rgba(231,76,60,0.4); transform: translateY(-2px); }
@@ -931,14 +1342,143 @@
   .no-deck-warning {
     background: rgba(231,76,60,0.1);
     border: 1px solid rgba(231,76,60,0.3);
-    border-radius: 10px;
-    padding: 16px 20px;
-    font-size: 13px;
-    color: #e74c3c;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    border-radius: 10px; padding: 12px 16px;
+    font-size: 13px; color: #e74c3c;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 16px;
   }
+
+  /* ===== COMBAT BOARD ===== */
+  #combat-board { display: flex; flex-direction: column; gap: 0; max-width: 900px; margin: 0 auto; user-select: none; }
+
+  #duel-status-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px; margin-bottom: 16px;
+    font-family: 'Cinzel', serif; font-size: 13px;
+  }
+
+  #duel-code-display { color: var(--gold); letter-spacing: 3px; font-weight: 700; }
+  #duel-role-display { color: var(--text-muted); font-size: 11px; letter-spacing: 2px; }
+
+  .btn-leave-duel {
+    background: rgba(231,76,60,0.15); border: 1px solid rgba(231,76,60,0.3);
+    border-radius: 6px; padding: 5px 12px; color: #e74c3c;
+    font-size: 11px; font-family: 'Raleway', sans-serif; cursor: pointer; transition: all 0.25s;
+  }
+
+  .btn-leave-duel:hover { background: rgba(231,76,60,0.3); }
+
+  .player-zone { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: rgba(255,255,255,0.015); border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); }
+  .my-zone { flex-direction: column-reverse; }
+
+  .zone-label { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
+
+  .board-grid { display: flex; flex-direction: column; gap: 6px; }
+
+  .board-row { display: flex; align-items: center; gap: 6px; }
+
+  .board-label { font-size: 10px; color: var(--text-muted); font-family: 'Cinzel', serif; letter-spacing: 1px; width: 56px; flex-shrink: 0; text-align: right; padding-right: 6px; }
+
+  .board-slot {
+    width: 82px; height: 115px;
+    border: 1px dashed rgba(201,168,76,0.18); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: rgba(201,168,76,0.08);
+    position: relative; flex-shrink: 0;
+    transition: border-color 0.25s, background 0.25s; cursor: pointer;
+  }
+
+  .board-slot[data-owner="me"]:hover { border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.04); }
+  .board-slot.slot-target { border-color: var(--gold) !important; background: rgba(201,168,76,0.1) !important; animation: slot-pulse 0.8s ease-in-out infinite; }
+
+  @keyframes slot-pulse { 0%,100%{border-color:rgba(201,168,76,0.5)} 50%{border-color:var(--gold)} }
+
+  .board-card { width: 100%; height: 100%; border-radius: 7px; overflow: hidden; position: relative; cursor: pointer; }
+  .board-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.2s; }
+  .board-card:hover img { filter: brightness(0.75); }
+  .board-card.rotated-90 { transform: rotate(90deg); width: 115px; height: 82px; margin: auto; }
+
+  .hand-row { display: flex; gap: 6px; flex-wrap: wrap; min-height: 100px; padding: 6px 0; }
+
+  .hand-card {
+    width: 68px; height: 95px; border-radius: 7px; overflow: hidden;
+    border: 1px solid var(--border); cursor: pointer; position: relative;
+    flex-shrink: 0; transition: transform 0.2s;
+  }
+
+  .hand-card:hover { transform: translateY(-8px); z-index: 5; }
+  .hand-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .hand-card.hidden-card {
+    background: linear-gradient(145deg, #10102a, #1c1c40);
+    border: 1px solid rgba(201,168,76,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: rgba(201,168,76,0.3); cursor: default;
+  }
+
+  .hand-card.hidden-card:hover { transform: none; }
+
+  .deck-cemetery-row { display: flex; gap: 12px; align-items: center; }
+
+  .mini-pile { width: 68px; text-align: center; cursor: pointer; transition: transform 0.2s; }
+  .mini-pile:hover { transform: translateY(-3px); }
+
+  .mini-pile-img {
+    width: 68px; height: 95px; border-radius: 7px; overflow: hidden;
+    border: 1px solid var(--border); background: var(--surface2);
+    display: flex; align-items: center; justify-content: center; position: relative;
+  }
+
+  .mini-pile-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cemetery-pile .mini-pile-img { border-color: rgba(231,76,60,0.3); }
+  .mini-pile-count { font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold); margin-top: 3px; font-weight: 700; }
+  .mini-pile-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-family: 'Cinzel', serif; }
+
+  .board-separator { padding: 6px 0; display: flex; align-items: center; }
+  .separator-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
+
+  /* Modal contextuel duel */
+  #duel-card-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    z-index: 700; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px);
+  }
+
+  #duel-card-modal.active { display: flex; }
+
+  .duel-modal-inner {
+    background: linear-gradient(145deg, var(--surface2), var(--surface));
+    border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+    display: flex; gap: 20px; align-items: flex-start; max-width: 480px; width: 90%;
+  }
+
+  .duel-modal-card { width: 110px; height: 154px; border-radius: 10px; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border); }
+  .duel-modal-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .duel-modal-actions { display: flex; flex-direction: column; gap: 7px; flex: 1; }
+
+  .duel-modal-title { font-family: 'Cinzel', serif; font-size: 12px; color: var(--gold); letter-spacing: 1px; margin-bottom: 4px; }
+
+  .duel-action-btn {
+    background: var(--surface3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; color: var(--text); font-family: 'Raleway', sans-serif;
+    font-size: 12px; cursor: pointer; text-align: left; transition: all 0.2s;
+  }
+
+  .duel-action-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+  .duel-action-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(231,76,60,0.08); }
+
+  .duel-action-btn-close { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; text-align: center; padding: 4px; font-family: 'Raleway', sans-serif; margin-top: 2px; }
+
+  .slot-pick-hint {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--gold); color: var(--deep); font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 2px;
+    padding: 12px 28px; border-radius: 30px; z-index: 600;
+    display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  }
+
+  .slot-pick-hint.active { display: block; }
 
   /* ===== TOAST ===== */
   #toast {
@@ -958,9 +1498,10 @@
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     max-width: 300px;
+    visibility: hidden;
   }
 
-  #toast.show { transform: translateX(0); }
+  #toast.show { transform: translateX(0); visibility: visible; }
 
   /* ===== LOADING ===== */
   .loader {
@@ -1058,32 +1599,32 @@
   <div class="tab-content active" id="tab-boosters">
     <div class="booster-arena">
       <div class="tab-title">Ouvrir des Boosters</div>
-      <div class="tab-subtitle">Chaque booster contient 5 cartes aléatoires de son extension</div>
+      <div class="tab-subtitle">Choisis ton booster, puis clique sur Ouvrir</div>
       <div class="booster-row">
-        <div class="booster-card" onclick="openBooster('OG')">
+        <div class="booster-card" id="booster-OG" onclick="selectBooster('OG')">
           <div class="booster-img-wrap">
             <img src="images/booster_OG.jpg" alt="Booster OG" onerror="this.parentElement.innerHTML='<div class=\'booster-img-placeholder\'>⭐</div>'">
           </div>
           <div class="booster-name">OG</div>
           <div class="booster-desc">Extension Originale<br>Les cartes fondatrices</div>
-          <button class="btn-open-booster">Ouvrir</button>
         </div>
-        <div class="booster-card" onclick="openBooster('PR')">
+        <div class="booster-card" id="booster-PR" onclick="selectBooster('PR')">
           <div class="booster-img-wrap">
             <img src="images/booster_PR.jpg" alt="Booster PR" onerror="this.parentElement.innerHTML='<div class=\'booster-img-placeholder\'>🌟</div>'">
           </div>
           <div class="booster-name">PR</div>
           <div class="booster-desc">Extension Primordiale<br>Pouvoirs anciens</div>
-          <button class="btn-open-booster">Ouvrir</button>
         </div>
-        <div class="booster-card" onclick="openBooster('TE')">
+        <div class="booster-card" id="booster-TE" onclick="selectBooster('TE')">
           <div class="booster-img-wrap">
             <img src="images/booster_TE.jpg" alt="Booster TE" onerror="this.parentElement.innerHTML='<div class=\'booster-img-placeholder\'>💫</div>'">
           </div>
           <div class="booster-name">TE</div>
           <div class="booster-desc">Extension Temporelle<br>Cartes du futur</div>
-          <button class="btn-open-booster">Ouvrir</button>
         </div>
+      </div>
+      <div id="booster-open-bar" style="display:none;text-align:center;margin-top:8px;">
+        <button class="btn-open-booster" style="width:auto;padding:14px 48px;font-size:15px;" onclick="openBooster()">✦ Ouvrir ce booster</button>
       </div>
     </div>
   </div>
@@ -1110,75 +1651,210 @@
   <!-- ===== TAB: DECK ===== -->
   <div class="tab-content" id="tab-deck">
     <div class="tab-title">Construire mon Deck</div>
-    <div class="tab-subtitle">25 cartes max • 2 exemplaires max par carte</div>
+    <div class="tab-subtitle">25 cartes max • 2 exemplaires max par carte (normales + brillantes cumulées)</div>
     <div class="deck-layout">
-      <div>
-        <div class="filter-bar">
-          <span class="filter-label">Extension :</span>
-          <button class="filter-btn active" onclick="filterDeck('ext','all',this)">Toutes</button>
-          <button class="filter-btn" onclick="filterDeck('ext','OG',this)">OG</button>
-          <button class="filter-btn" onclick="filterDeck('ext','PR',this)">PR</button>
-          <button class="filter-btn" onclick="filterDeck('ext','TE',this)">TE</button>
-          <span class="filter-label" style="margin-left:12px;">Type :</span>
-          <button class="filter-btn active" onclick="filterDeck('type','all',this)" data-group="dtype">Tous</button>
-          <button class="filter-btn" onclick="filterDeck('type','perso',this)" data-group="dtype">👤</button>
-          <button class="filter-btn" onclick="filterDeck('type','objet',this)" data-group="dtype">🎒</button>
-          <button class="filter-btn" onclick="filterDeck('type','piege',this)" data-group="dtype">⚡</button>
-        </div>
-        <div id="deck-collection-grid"></div>
+      <div class="filter-bar">
+        <span class="filter-label">Extension :</span>
+        <button class="filter-btn active" onclick="filterDeck('ext','all',this)">Toutes</button>
+        <button class="filter-btn" onclick="filterDeck('ext','OG',this)">OG</button>
+        <button class="filter-btn" onclick="filterDeck('ext','PR',this)">PR</button>
+        <button class="filter-btn" onclick="filterDeck('ext','TE',this)">TE</button>
+        <span class="filter-label" style="margin-left:12px;">Type :</span>
+        <button class="filter-btn active" onclick="filterDeck('type','all',this)" data-group="dtype">Tous</button>
+        <button class="filter-btn" onclick="filterDeck('type','perso',this)" data-group="dtype">👤</button>
+        <button class="filter-btn" onclick="filterDeck('type','objet',this)" data-group="dtype">🎒</button>
+        <button class="filter-btn" onclick="filterDeck('type','piege',this)" data-group="dtype">⚡</button>
       </div>
-      <div>
-        <div class="deck-panel">
-          <div class="deck-panel-title">✦ Mon Deck</div>
-          <div class="deck-slots" id="deck-slots"></div>
-          <div class="deck-count-info">
-            <span class="deck-count-text" id="deck-count-text">0/25</span>
-            <div class="deck-count-bar"><div class="deck-count-fill" id="deck-count-fill" style="width:0%"></div></div>
-          </div>
-          <button class="btn-save-deck" onclick="saveDeck()">💾 Sauvegarder le Deck</button>
-        </div>
-      </div>
+      <div id="deck-collection-grid"></div>
     </div>
   </div>
 
   <!-- ===== TAB: COMBAT ===== -->
   <div class="tab-content" id="tab-combat">
-    <div class="combat-center">
-      <div class="tab-title" style="text-align:center;margin-bottom:8px;">Arène de Combat</div>
-      <div class="tab-subtitle" style="text-align:center;margin-bottom:28px;">Défie un autre invocateur en partageant ton code</div>
-      <div class="combat-box">
-        <div class="combat-title">Ton Code de Combat</div>
-        <div class="combat-subtitle">Partage ce code avec ton adversaire pour qu'il puisse te rejoindre</div>
-        <div class="combat-code-display">
-          <div>
-            <div class="your-code-label">Ton code</div>
-            <div class="your-code-value" id="combat-code">------</div>
+    <!-- Écran de lobby -->
+    <div id="combat-lobby">
+      <div class="combat-center">
+        <div class="tab-title" style="text-align:center;margin-bottom:6px;">⚔️ Arène de Combat</div>
+        <div class="tab-subtitle" style="text-align:center;margin-bottom:28px;">Crée ou rejoins un duel en saisissant un code</div>
+        <div class="combat-box">
+          <div class="combat-title">Code de partie</div>
+          <div class="combat-subtitle">Choisis un code et partage-le, ou entre le code d'un ami</div>
+          <div id="no-deck-warn" class="no-deck-warning" style="display:none;margin-bottom:16px;">
+            ⚠️ Tu dois sauvegarder un deck de 25 cartes (Deck 1) avant de combattre !
           </div>
-          <button class="btn-copy" onclick="copyCode()">📋 Copier</button>
-        </div>
-        <div id="no-deck-warn" class="no-deck-warning" style="display:none;margin-bottom:20px;">
-          ⚠️ Tu dois d'abord construire et sauvegarder un deck de 25 cartes avant de pouvoir combattre !
-        </div>
-        <div class="combat-enter">
-          <input type="text" id="enemy-code" placeholder="CODE ADVERSE" maxlength="6">
-          <button class="btn-duel" onclick="startDuel()">⚔️ Duel !</button>
+          <div class="combat-enter" style="margin-bottom:16px;">
+            <input type="text" id="duel-code-input" placeholder="EX: DRAGON" maxlength="12" style="text-transform:uppercase;letter-spacing:3px;">
+            <button class="btn-duel" onclick="joinDuel()">⚔️ Rejoindre</button>
+          </div>
+          <div style="text-align:center;font-size:12px;color:var(--text-muted);font-family:'Cinzel',serif;letter-spacing:1px;">
+            Même code = même partie • 3e joueur = spectateur
+          </div>
         </div>
       </div>
-      <div id="combat-status" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center;">
-        <div style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin-bottom:8px;">Recherche d'adversaire...</div>
-        <div style="color:var(--text-muted);font-size:13px;margin-bottom:20px;">En attente que l'adversaire rejoigne le duel</div>
-        <div class="loader"></div>
+    </div>
+
+    <!-- Plateau de jeu (masqué jusqu'au duel) -->
+    <div id="combat-board" style="display:none;">
+      <!-- Barre de statut -->
+      <div id="duel-status-bar">
+        <div id="duel-code-display"></div>
+        <div id="duel-role-display"></div>
+        <button class="btn-leave-duel" onclick="leaveDuel()">✕ Quitter</button>
       </div>
+
+      <!-- Zone adversaire (en haut, miroir) -->
+      <div class="player-zone enemy-zone" id="enemy-zone">
+        <div class="zone-label">⚔️ <span id="enemy-name">Adversaire</span></div>
+        <!-- Main adversaire (masquée) -->
+        <div class="hand-row" id="enemy-hand"></div>
+        <!-- Plateau adversaire -->
+        <div class="board-grid" id="enemy-board">
+          <div class="board-row" data-row="piege" data-owner="enemy">
+            <div class="board-label">⚡ Pièges</div>
+            <div class="board-slot" data-slot="0" data-row="piege" data-owner="enemy"></div>
+            <div class="board-slot" data-slot="1" data-row="piege" data-owner="enemy"></div>
+            <div class="board-slot" data-slot="2" data-row="piege" data-owner="enemy"></div>
+          </div>
+          <div class="board-row" data-row="objet" data-owner="enemy">
+            <div class="board-label">🎒 Objets</div>
+            <div class="board-slot" data-slot="0" data-row="objet" data-owner="enemy"></div>
+            <div class="board-slot" data-slot="1" data-row="objet" data-owner="enemy"></div>
+            <div class="board-slot" data-slot="2" data-row="objet" data-owner="enemy"></div>
+          </div>
+          <div class="board-row" data-row="perso" data-owner="enemy">
+            <div class="board-label">👤 Persos</div>
+            <div class="board-slot" data-slot="0" data-row="perso" data-owner="enemy"></div>
+            <div class="board-slot" data-slot="1" data-row="perso" data-owner="enemy"></div>
+            <div class="board-slot" data-slot="2" data-row="perso" data-owner="enemy"></div>
+          </div>
+        </div>
+        <!-- Deck + Cimetière adversaire -->
+        <div class="deck-cemetery-row">
+          <div class="mini-pile" id="enemy-deck-pile" title="Deck adverse">
+            <div class="mini-pile-img"><img src="images/verso.jpg" onerror="this.style.display='none'"></div>
+            <div class="mini-pile-count" id="enemy-deck-count">0</div>
+            <div class="mini-pile-label">Deck</div>
+          </div>
+          <div class="mini-pile cemetery-pile" id="enemy-cemetery-pile" title="Cimetière adverse">
+            <div class="mini-pile-img" id="enemy-cemetery-top"></div>
+            <div class="mini-pile-count" id="enemy-cemetery-count">0</div>
+            <div class="mini-pile-label">Cimetière</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Séparateur -->
+      <div class="board-separator"><div class="separator-line"></div></div>
+
+      <!-- Zone joueur (en bas) -->
+      <div class="player-zone my-zone" id="my-zone">
+        <!-- Deck + Cimetière joueur -->
+        <div class="deck-cemetery-row">
+          <div class="mini-pile" id="my-deck-pile" onclick="openDeckMenu()" title="Mon deck">
+            <div class="mini-pile-img"><img src="images/verso.jpg" onerror="this.style.display='none'"></div>
+            <div class="mini-pile-count" id="my-deck-count">0</div>
+            <div class="mini-pile-label">Deck</div>
+          </div>
+          <div class="mini-pile cemetery-pile" id="my-cemetery-pile" onclick="openCemeteryMenu()" title="Mon cimetière">
+            <div class="mini-pile-img" id="my-cemetery-top"></div>
+            <div class="mini-pile-count" id="my-cemetery-count">0</div>
+            <div class="mini-pile-label">Cimetière</div>
+          </div>
+        </div>
+        <!-- Plateau joueur -->
+        <div class="board-grid" id="my-board">
+          <div class="board-row" data-row="perso" data-owner="me">
+            <div class="board-label">👤 Persos</div>
+            <div class="board-slot" data-slot="0" data-row="perso" data-owner="me"></div>
+            <div class="board-slot" data-slot="1" data-row="perso" data-owner="me"></div>
+            <div class="board-slot" data-slot="2" data-row="perso" data-owner="me"></div>
+          </div>
+          <div class="board-row" data-row="objet" data-owner="me">
+            <div class="board-label">🎒 Objets</div>
+            <div class="board-slot" data-slot="0" data-row="objet" data-owner="me"></div>
+            <div class="board-slot" data-slot="1" data-row="objet" data-owner="me"></div>
+            <div class="board-slot" data-slot="2" data-row="objet" data-owner="me"></div>
+          </div>
+          <div class="board-row" data-row="piege" data-owner="me">
+            <div class="board-label">⚡ Pièges</div>
+            <div class="board-slot" data-slot="0" data-row="piege" data-owner="me"></div>
+            <div class="board-slot" data-slot="1" data-row="piege" data-owner="me"></div>
+            <div class="board-slot" data-slot="2" data-row="piege" data-owner="me"></div>
+          </div>
+        </div>
+        <!-- Ma main -->
+        <div class="zone-label" style="margin-top:8px;">🃏 Ma main</div>
+        <div class="hand-row" id="my-hand"></div>
+      </div>
+    </div>
+  </div>
+
+<!-- BOOSTER OVERLAY -->
+<div id="booster-overlay">
+  <div id="aurora-layer"></div>
+  <canvas id="particle-canvas"></canvas>
+  <!-- Étape 1 : carte visible, on clique pour passer à la suivante -->
+  <div id="reveal-step" style="display:flex;flex-direction:column;align-items:center;gap:24px;">
+    <div id="reveal-counter" class="reveal-counter"></div>
+    <div id="reveal-card-wrap" class="single-reveal-wrap" onclick="nextCard()">
+      <!-- Les cartes fantômes de la pile sont injectées ici par le JS -->
+      <div class="single-card entering" id="single-card"></div>
+    </div>
+    <div id="reveal-hint" class="reveal-hint">Clique sur la carte pour la révéler</div>
+  </div>
+
+  <!-- Étape 2 : récapitulatif final -->
+  <div id="recap-step" style="display:none;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:900px;padding:0 20px;">
+    <div class="reveal-title">✦ Booster ouvert !</div>
+    <div id="recap-grid" class="recap-grid"></div>
+    <button class="btn-collect" id="btn-collect" onclick="collectCards()">✦ Récupérer mes cartes</button>
+  </div>
+</div>
+
+<!-- PANNEAU DECK FIXE (visible uniquement onglet deck) -->
+<div id="deck-fixed-panel">
+  <div class="deck-panel-header">
+    <div class="deck-panel-title">✦ Deck</div>
+    <div class="deck-selector">
+      <button class="deck-selector-btn active" onclick="switchDeck(1,this)">1</button>
+      <button class="deck-selector-btn" onclick="switchDeck(2,this)">2</button>
+      <button class="deck-selector-btn" onclick="switchDeck(3,this)">3</button>
+    </div>
+  </div>
+  <div class="deck-count-info">
+    <span class="deck-count-text" id="deck-count-text">0/25</span>
+    <div class="deck-count-bar"><div class="deck-count-fill" id="deck-count-fill" style="width:0%"></div></div>
+  </div>
+  <div class="deck-slots" id="deck-slots"></div>
+  <button class="btn-save-deck" onclick="saveDeck()">💾 Sauvegarder</button>
+</div>
+<div id="card-modal" onclick="closeCardModal(event)">
+  <div class="modal-inner">
+    <div class="modal-card-wrap" id="modal-card-wrap" onclick="document.getElementById('card-modal').classList.remove('active')"  style="cursor:pointer">
+      <img id="modal-card-img" src="" alt="">
+      <div class="shiny-overlay" id="modal-shiny-overlay" style="display:none"></div>
+    </div>
+    <div class="modal-toggle" id="modal-toggle" style="display:none">
+      <button class="modal-toggle-btn active" id="btn-normal" onclick="modalShowVersion('normal')">Normale</button>
+      <button class="modal-toggle-btn" id="btn-shiny" onclick="modalShowVersion('shiny')">✨ Brillante</button>
+    </div>
+    <div class="modal-counts" id="modal-counts"></div>
+  </div>
+</div>
+
+<!-- DUEL CARD MODAL -->
+<div id="duel-card-modal" onclick="closeDuelModal(event)">
+  <div class="duel-modal-inner">
+    <div class="duel-modal-card"><img id="duel-modal-img" src="" alt=""></div>
+    <div class="duel-modal-actions">
+      <div class="duel-modal-title" id="duel-modal-title">Que faire ?</div>
+      <div id="duel-modal-btns"></div>
     </div>
   </div>
 </div>
 
-<!-- BOOSTER OVERLAY -->
-<div id="booster-overlay">
-  <div class="reveal-title" id="reveal-title">Touche les cartes pour les révéler !</div>
-  <div class="cards-reveal-row" id="cards-reveal-row"></div>
-  <button class="btn-collect" id="btn-collect" onclick="collectCards()">✦ Récupérer mes cartes</button>
-</div>
+<!-- SLOT PICK HINT -->
+<div class="slot-pick-hint" id="slot-pick-hint">Clique sur un emplacement pour poser la carte — Échap pour annuler</div>
 
 <!-- Firebase SDKs -->
 <script type="module">
@@ -1215,8 +1891,49 @@ async function dbUpdate(path, value) { await update(ref(db, path), value); }
 // ===== GAME CONFIG =====
 const EXTENSIONS = ['OG','PR','TE'];
 const TYPES = ['perso','objet','piege'];
-const CARDS_PER_EXT = { OG: { perso:10, objet:8, piege:7 }, PR: { perso:10, objet:8, piege:7 }, TE: { perso:10, objet:8, piege:7 } };
-const CARDS_PER_BOOSTER = 5;
+
+// Liste exacte des IDs de cartes par extension et type
+// Les cartes rares sont marquées séparément pour usage futur
+const CARD_IDS = {
+  OG: {
+    perso: [
+      ...range(1,45),   // communes
+      ...range(121,125)  // rares
+    ],
+    objet: range(46,85),
+    piege: range(86,120),
+  },
+  PR: {
+    perso: [
+      ...range(1,35),   // communes + 035 rare
+      ...range(62,65)   // rares
+    ],
+    objet: range(36,48),
+    piege: range(49,61),
+  },
+  TE: {
+    perso: [
+      ...range(1,35),   // communes
+      ...range(64,65)   // rares
+    ],
+    objet: range(36,49),
+    piege: range(50,63),
+  },
+};
+
+const RARE_IDS = {
+  OG: { perso: range(121,125) },
+  PR: { perso: [35, ...range(62,65)] },
+  TE: { perso: range(64,65) },
+};
+
+function range(from, to) {
+  const arr = [];
+  for (let i = from; i <= to; i++) arr.push(i);
+  return arr;
+}
+
+const CARDS_PER_BOOSTER = 10;
 const MAX_DECK = 25;
 const MAX_COPIES = 2;
 
@@ -1225,10 +1942,10 @@ const TYPE_LABELS = { perso:'Personnage', objet:'Objet', piege:'Piège' };
 const EXT_NAMES = { OG:'Extension Originale', PR:'Extension Primordiale', TE:'Extension Temporelle' };
 
 // ===== STATE =====
-let currentUser = null;   // { username, combatCode }
+let currentUser = null;
 let collection = {};
-let deck = [];
 let pendingCards = [];
+let pendingFullRare = false;
 let collFilterExt = 'all';
 let collFilterType = 'all';
 let deckFilterExt = 'all';
@@ -1239,9 +1956,14 @@ function cardId(ext, type, num) {
   return `${ext}_${type}_${String(num).padStart(3,'0')}`;
 }
 
+function isShinyId(id) { return id.endsWith('_s'); }
+
+function baseId(id) { return isShinyId(id) ? id.slice(0, -2) : id; }
+
 function parseCardId(id) {
-  const parts = id.split('_');
-  return { ext: parts[0], type: parts[1], num: parseInt(parts[2]) };
+  const clean = baseId(id);
+  const parts = clean.split('_');
+  return { ext: parts[0], type: parts[1], num: parseInt(parts[2]), shiny: isShinyId(id) };
 }
 
 function cardImgSrc(id) {
@@ -1249,11 +1971,14 @@ function cardImgSrc(id) {
   return `images/${ext}/${ext}_${type}/${ext}_${type}_${String(num).padStart(3,'0')}.jpg`;
 }
 
+function isRare(ext, type, num) {
+  return !!(RARE_IDS[ext] && RARE_IDS[ext][type] && RARE_IDS[ext][type].includes(num));
+}
+
 function randomCard(ext) {
   const pool = [];
   for (const type of TYPES) {
-    const max = CARDS_PER_EXT[ext][type];
-    for (let i=1; i<=max; i++) pool.push(cardId(ext, type, i));
+    for (const num of CARD_IDS[ext][type]) pool.push(cardId(ext, type, num));
   }
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -1289,7 +2014,14 @@ window.switchAuthTab = function(tab) {
 async function loginUser(username, data) {
   currentUser = { username: data.username, combatCode: data.combatCode };
   collection = data.collection || {};
-  deck = data.deck || [];
+  // Support ancien format (deck unique) et nouveau (decks objet)
+  if (data.decks) {
+    decks = { 1: data.decks[1]||[], 2: data.decks[2]||[], 3: data.decks[3]||[] };
+  } else if (data.deck) {
+    decks = { 1: data.deck, 2: [], 3: [] };
+  } else {
+    decks = { 1: [], 2: [], 3: [] };
+  }
   saveSession(username);
   document.getElementById('header-username').textContent = data.username;
   document.getElementById('combat-code').textContent = data.combatCode || '------';
@@ -1368,72 +2100,440 @@ window.doLogout = function() {
 
 // ===== TABS =====
 window.showTab = function(tab) {
-  document.querySelectorAll('.nav-tab').forEach((el,i) => {
+  document.querySelectorAll('.nav-tab').forEach(el => {
     el.classList.toggle('active', el.getAttribute('onclick').includes(`'${tab}'`));
   });
   document.querySelectorAll('.tab-content').forEach(el => {
     el.classList.toggle('active', el.id === `tab-${tab}`);
   });
+  // Panneau deck fixe visible seulement sur l'onglet deck
+  document.getElementById('deck-fixed-panel').style.display = tab === 'deck' ? 'block' : 'none';
 };
 
 // ===== BOOSTERS =====
-window.openBooster = function(ext) {
-  const cards = [];
-  for (let i=0; i<CARDS_PER_BOOSTER; i++) cards.push(randomCard(ext));
-  pendingCards = cards;
+let selectedExt = null;
+let revealIndex = 0;
+let isAnimating = false;
 
-  const overlay = document.getElementById('booster-overlay');
-  const row = document.getElementById('cards-reveal-row');
-  const collectBtn = document.getElementById('btn-collect');
-  const title = document.getElementById('reveal-title');
-
-  row.innerHTML = '';
-  collectBtn.classList.remove('visible');
-  title.textContent = '✦ Touche les cartes pour les révéler !';
-  overlay.classList.add('active');
-
-  let revealedCount = 0;
-  cards.forEach((cid, idx) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'reveal-card';
-    wrap.style.animationDelay = `${idx*0.1}s`;
-    wrap.innerHTML = `
-      <div class="card-face card-back">SCG</div>
-      <div class="card-face card-front">
-        <img src="${cardImgSrc(cid)}" alt="${cid}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-        <div class="card-img-placeholder" style="display:none">
-          <span class="card-type-icon">${TYPE_ICONS[parseCardId(cid).type]}</span>
-          <span class="card-num">${cid}</span>
-        </div>
-      </div>
-    `;
-    wrap.addEventListener('click', () => {
-      if (wrap.classList.contains('flipped')) return;
-      wrap.classList.add('flipped');
-      revealedCount++;
-      if (revealedCount === cards.length) {
-        title.textContent = '✦ Toutes les cartes révélées !';
-        collectBtn.classList.add('visible');
-      }
-    });
-    row.appendChild(wrap);
-  });
+window.selectBooster = function(ext) {
+  selectedExt = ext;
+  document.querySelectorAll('.booster-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`booster-${ext}`).classList.add('selected');
+  document.getElementById('booster-open-bar').style.display = 'block';
 };
+
+window.openBooster = function() {
+  if (!selectedExt) return;
+
+  const ext = selectedExt;
+
+  // 1 chance sur 4096 d'avoir un booster full rare
+  const isFullRare = Math.random() < (1 / 4096);
+
+  // Générer 10 cartes avec les contraintes de slots et probabilités
+  const cards = generateBoosterCards(ext, isFullRare);
+  pendingCards = cards;
+  revealIndex = 0;
+  isAnimating = false;
+
+  document.getElementById('booster-overlay').classList.add('active');
+  document.getElementById('reveal-step').style.display = 'flex';
+  document.getElementById('recap-step').style.display = 'none';
+  document.getElementById('reveal-card-wrap').classList.remove('rare-glow');
+
+  // Aurora si au moins une rare (ou full rare)
+  const hasRare = isFullRare || pendingCards.some(cid => {
+    const p = parseCardId(cid);
+    return isRare(p.ext, p.type, p.num);
+  });
+  const aurora = document.getElementById('aurora-layer');
+  if (hasRare) {
+    setTimeout(() => aurora.classList.add('visible'), 400);
+  } else {
+    aurora.classList.remove('visible');
+  }
+
+  // Full rare → particules dès le début et pendant tout le booster
+  if (isFullRare) {
+    setTimeout(() => startParticles(), 500);
+  } else {
+    killParticles();
+  }
+
+  // Stocker le flag pour showCard
+  pendingFullRare = isFullRare;
+
+  showCard(0);
+};
+
+function generateBoosterCards(ext, fullRare) {
+  const persoCount = 5 + Math.floor(Math.random() * 3);
+  const remaining = CARDS_PER_BOOSTER - persoCount;
+  const objetCount = Math.floor(Math.random() * (remaining + 1));
+  const piegeCount = remaining - objetCount;
+
+  const slots = [
+    { type: 'perso', count: persoCount },
+    { type: 'objet', count: objetCount },
+    { type: 'piege', count: piegeCount },
+  ].filter(s => s.count > 0);
+
+  const result = [];
+
+  for (const { type, count } of slots) {
+    const allNums = CARD_IDS[ext][type];
+    const rareNums = (RARE_IDS[ext] && RARE_IDS[ext][type]) ? RARE_IDS[ext][type] : [];
+    const normalNums = allNums.filter(n => !rareNums.includes(n));
+
+    for (let i = 0; i < count; i++) {
+      let num;
+      let shiny = false;
+
+      if (fullRare && rareNums.length > 0) {
+        num = rareNums[Math.floor(Math.random() * rareNums.length)];
+        shiny = Math.random() < 0.3; // brillantes plus fréquentes en full rare
+      } else if (rareNums.length > 0) {
+        // Poids : normale=2, brillante=0.8, rare=0.67 → ~5% par slot
+        const totalWeight = normalNums.length * 2 + normalNums.length * 0.8 + rareNums.length * 0.67;
+        let roll = Math.random() * totalWeight;
+        if (roll < normalNums.length * 2) {
+          num = normalNums[Math.floor(Math.random() * normalNums.length)];
+        } else if (roll < normalNums.length * 2 + normalNums.length * 0.8) {
+          num = normalNums[Math.floor(Math.random() * normalNums.length)];
+          shiny = true;
+        } else {
+          num = rareNums[Math.floor(Math.random() * rareNums.length)];
+        }
+      } else {
+        // Pas de rares dans ce type : normale ou brillante
+        num = allNums[Math.floor(Math.random() * allNums.length)];
+        shiny = Math.random() < (0.8 / (2 + 0.8)); // ~28%
+      }
+      result.push(cardId(ext, type, num) + (shiny ? '_s' : ''));
+    }
+  }
+
+  // Mélanger
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+
+  // Jamais 2 rares consécutives (sauf full rare)
+  if (!fullRare) {
+    for (let i = 0; i < result.length - 1; i++) {
+      const a = parseCardId(result[i]);
+      const b = parseCardId(result[i + 1]);
+      if (isRare(a.ext, a.type, a.num) && isRare(b.ext, b.type, b.num)) {
+        for (let j = i + 2; j < result.length; j++) {
+          const c = parseCardId(result[j]);
+          if (!isRare(c.ext, c.type, c.num)) {
+            [result[i + 1], result[j]] = [result[j], result[i + 1]];
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+function showCard(idx) {
+  const cid = pendingCards[idx];
+  const { ext, type, num, shiny } = parseCardId(cid);
+  const total = pendingCards.length;
+
+  const remaining = pendingCards.length - idx;
+  document.getElementById('reveal-counter').textContent = `${remaining} carte${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}`;
+
+  const hint = document.getElementById('reveal-hint');
+  hint.textContent = idx < total - 1 ? 'Clique pour voir la suivante' : 'Clique pour le récapitulatif';
+
+  const wrap = document.getElementById('reveal-card-wrap');
+
+  const thisIsRare = isRare(ext, type, num);
+  const nextIsRare = idx + 1 < total && (() => {
+    const nc = parseCardId(pendingCards[idx + 1]);
+    return isRare(nc.ext, nc.type, nc.num);
+  })();
+
+  const newCard = document.createElement('div');
+  newCard.className = 'single-card' + (shiny ? ' shiny-card' : '');
+  newCard.innerHTML = `
+    <img src="${cardImgSrc(cid)}" alt="${cid}"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    <div class="card-img-placeholder" style="display:none">
+      <span class="card-type-icon">${TYPE_ICONS[type]}</span>
+      <span class="card-num">${baseId(cid)}</span>
+    </div>
+    ${shiny ? '<div class="shiny-overlay"></div>' : ''}`;
+
+  wrap.appendChild(newCard);
+  requestAnimationFrame(() => { newCard.classList.add('entering'); });
+
+  const old = document.getElementById('single-card');
+  if (old) old.remove();
+  newCard.id = 'single-card';
+
+  // Glow derrière la carte si c'est une rare
+  if (thisIsRare) {
+    wrap.classList.add('rare-glow');
+  } else {
+    wrap.classList.remove('rare-glow');
+  }
+
+  // Particules :
+  // - full rare : toujours actives, ne pas toucher
+  // - sinon : démarrent sur la carte AVANT la rare, restent sur la rare, s'arrêtent après
+  if (!pendingFullRare) {
+    if (nextIsRare) {
+      startParticles();
+    } else if (thisIsRare) {
+      // garder actives — ne pas appeler stopParticles
+    } else {
+      stopParticles();
+    }
+  }
+
+  isAnimating = false;
+}
+
+window.nextCard = function() {
+  if (isAnimating) return;
+  isAnimating = true;
+
+  const current = document.getElementById('single-card');
+  const isLast = revealIndex === pendingCards.length - 1;
+
+  current.classList.remove('entering');
+  current.classList.add('leaving');
+
+  setTimeout(() => {
+    if (isLast) {
+      showRecap();
+    } else {
+      revealIndex++;
+      showCard(revealIndex);
+    }
+  }, 280);
+};
+
+// ===== PARTICULES =====
+let particleAnimId = null;
+let particles = [];
+
+function startParticles() {
+  const canvas = document.getElementById('particle-canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.classList.add('visible');
+
+  const ctx = canvas.getContext('2d');
+  particles = [];
+
+  // Spawn progressif sur 1.5s pour un démarrage doux
+  let spawnStart = null;
+  const spawnDuration = 1500;
+  const maxParticles = 80;
+
+  function spawnParticle() {
+    const x = Math.random() * canvas.width;
+    const colors = [
+      `hsla(${Math.random()*360},90%,75%,`,
+      'hsla(50,100%,80%,',
+      'hsla(200,100%,80%,',
+    ];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const size = 2 + Math.random() * 3.5;
+    return {
+      x, y: canvas.height + 10,
+      vx: (Math.random() - 0.5) * 1.2,
+      vy: -(1.2 + Math.random() * 2.5),
+      size,
+      color,
+      alpha: 0,
+      alphaTarget: 0.6 + Math.random() * 0.4,
+      life: 0,
+      maxLife: 120 + Math.random() * 100,
+      twinkleSpeed: 0.04 + Math.random() * 0.06,
+      twinkleOffset: Math.random() * Math.PI * 2,
+    };
+  }
+
+  function animate(ts) {
+    if (!spawnStart) spawnStart = ts;
+    const elapsed = ts - spawnStart;
+    const spawnRatio = Math.min(elapsed / spawnDuration, 1);
+    const targetCount = Math.floor(spawnRatio * maxParticles);
+
+    // Spawn de nouvelles particules progressivement
+    while (particles.length < targetCount) particles.push(spawnParticle());
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles = particles.filter(p => {
+      p.life++;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Apparition douce
+      if (p.alpha < p.alphaTarget) p.alpha = Math.min(p.alpha + 0.03, p.alphaTarget);
+
+      // Scintillement
+      const twinkle = 0.5 + 0.5 * Math.sin(p.life * p.twinkleSpeed + p.twinkleOffset);
+      const a = p.alpha * twinkle;
+
+      // Disparition en fin de vie
+      const lifeRatio = p.life / p.maxLife;
+      const fade = lifeRatio > 0.7 ? 1 - (lifeRatio - 0.7) / 0.3 : 1;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + (a * fade) + ')';
+      ctx.fill();
+
+      // Halo doux
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + (a * fade * 0.15) + ')';
+      ctx.fill();
+
+      // Recycler en bas quand la particule sort par le haut
+      if (p.y < -10 || p.life > p.maxLife) {
+        Object.assign(p, spawnParticle());
+        return true;
+      }
+      return true;
+    });
+
+    particleAnimId = requestAnimationFrame(animate);
+  }
+
+  if (particleAnimId) cancelAnimationFrame(particleAnimId);
+  particleAnimId = requestAnimationFrame(animate);
+}
+
+function stopParticles() {
+  // Juste couper le canvas visuellement — l'animation continue en fond
+  // le nettoyage réel se fait seulement quand on relance ou ferme
+  const canvas = document.getElementById('particle-canvas');
+  canvas.classList.remove('visible');
+  // Nettoyer vraiment après la transition CSS (1.5s)
+  // mais on garde particleAnimId actif pour que le redémarrage soit propre
+}
+
+function killParticles() {
+  // Arrêt complet (utilisé à la fermeture)
+  if (particleAnimId) { cancelAnimationFrame(particleAnimId); particleAnimId = null; }
+  const canvas = document.getElementById('particle-canvas');
+  canvas.classList.remove('visible');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles = [];
+}
+
+function closeBoosterEffects() {
+  document.getElementById('aurora-layer').classList.remove('visible');
+  document.getElementById('reveal-card-wrap').classList.remove('rare-glow');
+  pendingFullRare = false;
+  killParticles();
+}
+
+function showRecap() {
+  document.getElementById('reveal-step').style.display = 'none';
+  const recapStep = document.getElementById('recap-step');
+  recapStep.style.display = 'flex';
+
+  const grid = document.getElementById('recap-grid');
+  grid.innerHTML = '';
+  pendingCards.forEach((cid, i) => {
+    const { type } = parseCardId(cid);
+    const div = document.createElement('div');
+    div.className = 'recap-card';
+    div.style.animationDelay = `${i * 0.06}s`;
+    div.innerHTML = `
+      <img src="${cardImgSrc(cid)}" alt="${cid}"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="card-img-placeholder" style="display:none">
+        <span style="font-size:28px">${TYPE_ICONS[type]}</span>
+        <span>${cid}</span>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
 
 window.collectCards = async function() {
   if (!currentUser || !pendingCards.length) return;
+  closeBoosterEffects();
   const newColl = { ...collection };
   for (const cid of pendingCards) {
-    newColl[cid] = (newColl[cid] || 0) + 1;
+    // cid peut être "OG_perso_001" ou "OG_perso_001_s"
+    // On stocke sous la clé Firebase-safe (remplacer _ par - pour les _s)
+    const key = cid; // Firebase accepte les underscores
+    newColl[key] = (newColl[key] || 0) + 1;
   }
   collection = newColl;
-  const key = currentUser.username.toLowerCase().replace(/\s+/g,'_');
-  await dbUpdate(`users/${key}`, { collection });
+  const userKey = currentUser.username.toLowerCase().replace(/\s+/g,'_');
+  await dbUpdate(`users/${userKey}`, { collection });
   document.getElementById('booster-overlay').classList.remove('active');
   pendingCards = [];
   renderCollection();
   renderDeckCollection();
   showToast('✦ Cartes ajoutées à ta collection !');
+};
+
+// ===== MODAL CARTE =====
+let modalCurrentBase = null;
+let modalCurrentVersion = 'normal'; // 'normal' | 'shiny'
+
+window.openCardModal = function(cid) {
+  modalCurrentBase = cid;
+  const countNormal = collection[cid] || 0;
+  const countShiny = collection[cid + '_s'] || 0;
+  // Afficher la brillante par défaut si on en a et pas de normale
+  modalCurrentVersion = (countNormal === 0 && countShiny > 0) ? 'shiny' : 'normal';
+  refreshModal(cid, countNormal, countShiny);
+  document.getElementById('card-modal').classList.add('active');
+};
+
+function refreshModal(cid, countNormal, countShiny) {
+  const isShinyView = modalCurrentVersion === 'shiny';
+  const wrap = document.getElementById('modal-card-wrap');
+  const img = document.getElementById('modal-card-img');
+  const overlay = document.getElementById('modal-shiny-overlay');
+  const toggle = document.getElementById('modal-toggle');
+  const counts = document.getElementById('modal-counts');
+
+  img.src = cardImgSrc(cid);
+  img.onerror = () => { img.style.display='none'; };
+
+  overlay.style.display = isShinyView ? 'block' : 'none';
+  wrap.classList.toggle('shiny-modal', isShinyView);
+
+  // Toggle visible seulement si on a les deux versions
+  const hasBoth = countNormal > 0 && countShiny > 0;
+  toggle.style.display = hasBoth ? 'flex' : 'none';
+  document.getElementById('btn-normal').classList.toggle('active', !isShinyView);
+  document.getElementById('btn-shiny').classList.toggle('active', isShinyView);
+
+  // Compteurs
+  let countsHtml = '';
+  if (countNormal > 0) countsHtml += `<span>Normale <b>×${countNormal}</b></span>`;
+  if (countShiny > 0) countsHtml += `<span>✨ Brillante <b>×${countShiny}</b></span>`;
+  counts.innerHTML = countsHtml;
+}
+
+window.modalShowVersion = function(version) {
+  modalCurrentVersion = version;
+  const cid = modalCurrentBase;
+  refreshModal(cid, collection[cid] || 0, collection[cid + '_s'] || 0);
+};
+
+window.closeCardModal = function(e) {
+  if (e && e.target !== document.getElementById('card-modal')) return;
+  document.getElementById('card-modal').classList.remove('active');
+  modalCurrentBase = null;
 };
 
 // ===== COLLECTION RENDER =====
@@ -1457,23 +2557,25 @@ function renderCollection() {
   const types = collFilterType === 'all' ? TYPES : [collFilterType];
 
   let html = '';
-  let totalOwned = 0;
   for (const ext of exts) {
     let cardsHtml = '';
     let extCount = 0;
     for (const type of types) {
-      const max = CARDS_PER_EXT[ext][type];
-      for (let n=1; n<=max; n++) {
-        const cid = cardId(ext, type, n);
-        const count = collection[cid] || 0;
-        if (count === 0) continue;
+      for (const num of CARD_IDS[ext][type]) {
+        const cid = cardId(ext, type, num);
+        const cidS = cid + '_s';
+        const countNormal = collection[cid] || 0;
+        const countShiny = collection[cidS] || 0;
+        const totalCount = countNormal + countShiny;
+        if (totalCount === 0) continue;
         extCount++;
-        totalOwned++;
+        const hasShiny = countShiny > 0;
         cardsHtml += `
-          <div class="coll-card">
+          <div class="coll-card${hasShiny ? ' shiny' : ''}" onclick="openCardModal('${cid}')">
             <img src="${cardImgSrc(cid)}" alt="${cid}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
             <div class="card-placeholder" style="display:none"><span class="type-icon">${TYPE_ICONS[type]}</span><span style="font-size:9px;color:var(--gold);font-family:'Cinzel',serif">${cid}</span></div>
-            ${count > 1 ? `<div class="card-count-badge">×${count}</div>` : ''}
+            ${hasShiny ? '<div class="shiny-badge">✨</div>' : ''}
+            ${totalCount > 1 ? `<div class="card-count-badge">×${totalCount}</div>` : ''}
           </div>`;
       }
     }
@@ -1503,6 +2605,23 @@ function renderCollection() {
 }
 
 // ===== DECK RENDER =====
+let currentDeckIdx = 1; // 1, 2 ou 3
+// decks est un objet { 1: [...], 2: [...], 3: [...] }
+let decks = { 1: [], 2: [], 3: [] };
+// deck pointe toujours sur le deck courant
+Object.defineProperty(window, 'deck', {
+  get: () => decks[currentDeckIdx],
+  set: (v) => { decks[currentDeckIdx] = v; }
+});
+
+window.switchDeck = function(idx, btn) {
+  currentDeckIdx = idx;
+  document.querySelectorAll('.deck-selector-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDeckSlots();
+  renderDeckCollection();
+};
+
 window.filterDeck = function(dim, val, el) {
   const group = el.getAttribute('data-group');
   if (group) {
@@ -1516,7 +2635,16 @@ window.filterDeck = function(dim, val, el) {
   renderDeckCollection();
 };
 
-function deckCopiesOf(cid) { return deck.filter(id => id === cid).length; }
+// Nombre de fois que cid (baseId) apparaît dans le deck courant
+function deckCopiesOf(cid) {
+  return decks[currentDeckIdx].filter(id => baseId(id) === baseId(cid)).length;
+}
+
+// Nombre total d'exemplaires disponibles dans la collection (normal + brillant)
+function collectionCopiesOf(cid) {
+  const b = baseId(cid);
+  return (collection[b] || 0) + (collection[b + '_s'] || 0);
+}
 
 function renderDeckCollection() {
   const container = document.getElementById('deck-collection-grid');
@@ -1526,20 +2654,40 @@ function renderDeckCollection() {
   for (const ext of exts) {
     let cardsHtml = '';
     for (const type of types) {
-      const max = CARDS_PER_EXT[ext][type];
-      for (let n=1; n<=max; n++) {
-        const cid = cardId(ext, type, n);
-        const count = collection[cid] || 0;
-        if (count === 0) continue;
+      for (const num of CARD_IDS[ext][type]) {
+        const cid = cardId(ext, type, num);
+        const cidS = cid + '_s';
+        const ownedNormal = collection[cid] || 0;
+        const ownedShiny = collection[cidS] || 0;
+        const totalOwned = ownedNormal + ownedShiny;
+        if (totalOwned === 0) continue;
+
         const inDeckCount = deckCopiesOf(cid);
-        const isMaxed = inDeckCount >= MAX_COPIES || deck.length >= MAX_DECK;
+        const deckFull = decks[currentDeckIdx].length >= MAX_DECK;
+        const atMaxCopies = inDeckCount >= MAX_COPIES;
+        const atMaxOwned = inDeckCount >= totalOwned;
+        const isMaxed = atMaxCopies || atMaxOwned || deckFull;
         const inDeck = inDeckCount > 0;
+        const hasShiny = ownedShiny > 0;
+
+        const canAddNormal = !deckFull && !atMaxCopies && !atMaxOwned && ownedNormal > 0;
+        const canAddShiny  = !deckFull && !atMaxCopies && !atMaxOwned && ownedShiny > 0;
+
+        let btns = '';
+        if (isMaxed) {
+          btns = `<button class="add-to-deck-btn disabled-btn" disabled>✗ Max</button>`;
+        } else {
+          if (canAddNormal) btns += `<button class="add-to-deck-btn" onclick="event.stopPropagation();addToDeck('${cid}')">+ Normale</button>`;
+          if (canAddShiny)  btns += `<button class="add-to-deck-btn shiny-btn" onclick="event.stopPropagation();addToDeck('${cidS}')">✨ Brillante</button>`;
+        }
+
         cardsHtml += `
-          <div class="coll-card${inDeck?' in-deck':''}${isMaxed?' maxed':''}">
+          <div class="coll-card${inDeck ? ' in-deck' : ''}${isMaxed ? ' maxed' : ''}${hasShiny ? ' shiny' : ''}" onclick="openCardModal('${cid}')">
             <img src="${cardImgSrc(cid)}" alt="${cid}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-            <div class="card-placeholder" style="display:none"><span class="type-icon">${TYPE_ICONS[type]}</span><span style="font-size:9px;color:var(--gold);font-family:'Cinzel',serif">${cid}</span></div>
+            <div class="card-placeholder" style="display:none"><span class="type-icon">${TYPE_ICONS[type]}</span></div>
+            ${hasShiny ? '<div class="shiny-badge">✨</div>' : ''}
             ${inDeckCount > 0 ? `<div class="card-count-badge">×${inDeckCount}</div>` : ''}
-            <button class="add-to-deck-btn" onclick="addToDeck('${cid}')">${isMaxed ? '✗ Max' : '+ Deck'}</button>
+            <div class="deck-add-wrap">${btns}</div>
           </div>`;
       }
     }
@@ -1564,40 +2712,43 @@ function renderDeckCollection() {
 function renderDeckSlots() {
   const container = document.getElementById('deck-slots');
   container.innerHTML = '';
-  for (let i=0; i<MAX_DECK; i++) {
+  const currentDeck = decks[currentDeckIdx];
+  for (let i = 0; i < MAX_DECK; i++) {
     const slot = document.createElement('div');
     slot.className = 'deck-slot';
-    if (i < deck.length) {
-      const cid = deck[i];
+    if (i < currentDeck.length) {
+      const cid = currentDeck[i];
       slot.classList.add('filled');
-      slot.innerHTML = `
-        <div class="deck-card-wrap">
-          <img src="${cardImgSrc(cid)}" alt="${cid}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-          <div class="slot-placeholder card-placeholder" style="display:none;width:80px;height:112px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);">
-            <span class="type-icon">${TYPE_ICONS[parseCardId(cid).type]}</span>
-          </div>
-          <button class="deck-remove-btn" onclick="removeFromDeck(${i})">✕</button>
-        </div>`;
+      const wrap = document.createElement('div');
+      wrap.className = 'deck-card-wrap';
+      wrap.innerHTML = `
+        <img src="${cardImgSrc(cid)}" alt="${cid}"
+          onerror="this.style.display='none'"
+          onclick="openCardModal('${baseId(cid)}')">
+        <button class="deck-remove-btn" onclick="removeFromDeck(${i})">✕</button>`;
+      slot.appendChild(wrap);
     } else {
       slot.textContent = '✦';
     }
     container.appendChild(slot);
   }
-  const pct = (deck.length / MAX_DECK) * 100;
-  document.getElementById('deck-count-text').textContent = `${deck.length}/${MAX_DECK}`;
+  const pct = (currentDeck.length / MAX_DECK) * 100;
+  document.getElementById('deck-count-text').textContent = `${currentDeck.length}/${MAX_DECK}`;
   document.getElementById('deck-count-fill').style.width = pct + '%';
 }
 
 window.addToDeck = function(cid) {
-  if (deck.length >= MAX_DECK) { showToast('⚠️ Deck complet (25 cartes max) !'); return; }
-  if (deckCopiesOf(cid) >= MAX_COPIES) { showToast('⚠️ 2 exemplaires maximum par carte !'); return; }
-  deck.push(cid);
+  const currentDeck = decks[currentDeckIdx];
+  if (currentDeck.length >= MAX_DECK) { showToast('⚠️ Deck complet !'); return; }
+  if (deckCopiesOf(cid) >= MAX_COPIES) { showToast('⚠️ 2 exemplaires max par carte !'); return; }
+  if (deckCopiesOf(cid) >= collectionCopiesOf(cid)) { showToast('⚠️ Tu n\'as pas assez d\'exemplaires !'); return; }
+  decks[currentDeckIdx].push(cid);
   renderDeckSlots();
   renderDeckCollection();
 };
 
 window.removeFromDeck = function(idx) {
-  deck.splice(idx, 1);
+  decks[currentDeckIdx].splice(idx, 1);
   renderDeckSlots();
   renderDeckCollection();
 };
@@ -1605,45 +2756,446 @@ window.removeFromDeck = function(idx) {
 window.saveDeck = async function() {
   if (!currentUser) return;
   const key = currentUser.username.toLowerCase().replace(/\s+/g,'_');
-  await dbUpdate(`users/${key}`, { deck });
+  await dbUpdate(`users/${key}`, { decks });
+  // Pour la compat combat, deck 1 = deck principal
   checkDeckForCombat();
-  showToast('✦ Deck sauvegardé avec succès !');
+  showToast(`✦ Deck ${currentDeckIdx} sauvegardé !`);
 };
 
 // ===== COMBAT =====
 function checkDeckForCombat() {
   const warn = document.getElementById('no-deck-warn');
-  warn.style.display = deck.length < MAX_DECK ? 'flex' : 'none';
+  if (warn) warn.style.display = (decks[1]||[]).length < MAX_DECK ? 'flex' : 'none';
 }
 
-window.copyCode = function() {
-  const code = document.getElementById('combat-code').textContent;
-  navigator.clipboard.writeText(code).then(() => showToast('✦ Code copié dans le presse-papier !'));
+// État local du duel
+let duelCode = null;
+let duelRole = null; // 'p1' | 'p2' | 'spectator'
+let duelUnsub = null;
+let duelState = null;
+let duelPendingCard = null;  // { cid, source, sourceIdx } carte en attente d'être posée
+let duelPendingMode = null;  // 'attack' | 'defense' | 'hidden'
+let duelPickingSlot = false;
+
+// Mélanger un tableau
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+window.joinDuel = async function() {
+  const code = document.getElementById('duel-code-input').value.trim().toUpperCase();
+  if (!code) { showToast('⚠️ Entre un code de partie !'); return; }
+  if ((decks[1]||[]).length < MAX_DECK) { showToast('⚠️ Sauvegarde un deck de 25 cartes d\'abord !'); return; }
+
+  duelCode = code;
+
+  // Lire l'état actuel de la partie
+  const existing = await dbGet(`duels/${code}`);
+
+  if (!existing) {
+    // Créer la partie (p1)
+    duelRole = 'p1';
+    const myDeck = shuffleArr(decks[1]);
+    const initState = {
+      code,
+      p1: currentUser.username,
+      p2: null,
+      status: 'waiting', // waiting | playing
+      p1State: {
+        deck: myDeck,
+        hand: [],
+        board: { perso: [null,null,null], objet: [null,null,null], piege: [null,null,null] },
+        cemetery: []
+      },
+      p2State: null,
+      createdAt: Date.now()
+    };
+    await dbSet(`duels/${code}`, initState);
+  } else if (!existing.p2) {
+    // Rejoindre en p2
+    duelRole = 'p2';
+    const myDeck = shuffleArr(decks[1]);
+    const p2State = {
+      deck: myDeck,
+      hand: [],
+      board: { perso: [null,null,null], objet: [null,null,null], piege: [null,null,null] },
+      cemetery: []
+    };
+    await dbUpdate(`duels/${code}`, { p2: currentUser.username, p2State, status: 'playing' });
+  } else {
+    // Spectateur
+    duelRole = 'spectator';
+  }
+
+  // Afficher le plateau
+  document.getElementById('combat-lobby').style.display = 'none';
+  document.getElementById('combat-board').style.display = 'flex';
+  document.getElementById('duel-code-display').textContent = `⚔ ${code}`;
+  document.getElementById('duel-role-display').textContent = duelRole === 'spectator' ? '👁 SPECTATEUR' : duelRole === 'p1' ? '🛡 Joueur 1' : '⚔ Joueur 2';
+
+  // Écoute en temps réel
+  const { onValue, ref: fbRef } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+  duelUnsub = onValue(fbRef(db, `duels/${code}`), snap => {
+    if (!snap.exists()) return;
+    duelState = snap.val();
+    renderBoard();
+  });
+
+  // Touche Échap pour annuler placement
+  document.addEventListener('keydown', onEscKey);
 };
 
-window.startDuel = async function() {
-  if (deck.length < MAX_DECK) {
-    showToast('⚠️ Tu dois avoir un deck de 25 cartes !');
-    return;
+function onEscKey(e) {
+  if (e.key === 'Escape') cancelPlacement();
+}
+
+window.leaveDuel = async function() {
+  if (duelUnsub) { duelUnsub(); duelUnsub = null; }
+  document.removeEventListener('keydown', onEscKey);
+  cancelPlacement();
+  duelCode = null; duelRole = null; duelState = null;
+  document.getElementById('combat-board').style.display = 'none';
+  document.getElementById('combat-lobby').style.display = 'block';
+};
+
+// ===== RENDU DU PLATEAU =====
+function renderBoard() {
+  if (!duelState) return;
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const enemyKey = duelRole === 'p1' ? 'p2State' : 'p1State';
+  const enemyName = duelRole === 'p1' ? duelState.p2 : duelState.p1;
+  const myState = duelState[myKey];
+  const enemyState = duelState[enemyKey];
+
+  document.getElementById('enemy-name').textContent = enemyName || (duelState.status === 'waiting' ? 'En attente…' : 'Adversaire');
+
+  if (!myState && duelRole !== 'spectator') return;
+
+  // Ma main
+  renderHand('my-hand', myState?.hand || [], false);
+  // Main adversaire masquée
+  renderHand('enemy-hand', enemyState?.hand || [], true);
+
+  // Plateau
+  const rows = ['perso','objet','piege'];
+  for (const row of rows) {
+    for (let i=0; i<3; i++) {
+      const mySlot = document.querySelector(`#my-board .board-slot[data-row="${row}"][data-slot="${i}"]`);
+      const enemySlot = document.querySelector(`#enemy-board .board-slot[data-row="${row}"][data-slot="${i}"]`);
+      if (mySlot) renderSlot(mySlot, myState?.board?.[row]?.[i], true);
+      if (enemySlot) renderSlot(enemySlot, enemyState?.board?.[row]?.[i], false);
+    }
   }
-  const enemyCode = document.getElementById('enemy-code').value.trim().toUpperCase();
-  if (!enemyCode || enemyCode.length < 4) {
-    showToast('⚠️ Entre le code de ton adversaire !');
-    return;
+
+  // Decks et cimetières
+  updatePile('my-deck-count', myState?.deck?.length || 0);
+  updatePile('enemy-deck-count', enemyState?.deck?.length || 0);
+  updatePile('my-cemetery-count', myState?.cemetery?.length || 0);
+  updatePile('enemy-cemetery-count', enemyState?.cemetery?.length || 0);
+
+  // Dessus du cimetière
+  const myCemTop = myState?.cemetery?.at(-1);
+  const enemyCemTop = enemyState?.cemetery?.at(-1);
+  const myCemEl = document.getElementById('my-cemetery-top');
+  const enemyCemEl = document.getElementById('enemy-cemetery-top');
+  if (myCemEl) myCemEl.innerHTML = myCemTop ? `<img src="${cardImgSrc(myCemTop)}" style="width:100%;height:100%;object-fit:cover;display:block">` : '';
+  if (enemyCemEl) enemyCemEl.innerHTML = enemyCemTop ? `<img src="${cardImgSrc(enemyCemTop)}" style="width:100%;height:100%;object-fit:cover;display:block">` : '';
+}
+
+function updatePile(id, count) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = count;
+}
+
+function renderHand(containerId, hand, hidden) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  const count = hand.length;
+  if (hidden) {
+    for (let i=0; i<count; i++) {
+      const card = document.createElement('div');
+      card.className = 'hand-card hidden-card';
+      card.innerHTML = '<img src="images/verso.jpg" onerror="this.style.display=\'none\'">';
+      el.appendChild(card);
+    }
+  } else {
+    hand.forEach((cid, idx) => {
+      const card = document.createElement('div');
+      card.className = 'hand-card';
+      card.innerHTML = `<img src="${cardImgSrc(cid)}" onerror="this.style.display='none'">`;
+      card.onclick = () => openHandCardModal(cid, idx);
+      el.appendChild(card);
+    });
   }
-  if (enemyCode === currentUser?.combatCode) {
-    showToast('⚠️ Tu ne peux pas te battre contre toi-même !');
-    return;
+}
+
+function renderSlot(el, cardData, isMe) {
+  el.innerHTML = '';
+  if (!cardData) return;
+
+  const div = document.createElement('div');
+  const isHidden = cardData.mode === 'hidden';
+  const isRotated = cardData.mode === 'defense' || cardData.mode === 'hidden';
+
+  div.className = 'board-card' + (isRotated ? ' rotated-90' : '');
+
+  if (isHidden && !isMe) {
+    div.innerHTML = `<img src="images/verso.jpg" onerror="this.style.display='none'">`;
+  } else {
+    div.innerHTML = `<img src="${cardImgSrc(cardData.cid)}" onerror="this.style.display='none'">`;
   }
-  showToast('🔍 Recherche de l\'adversaire... (fonctionnalité combat à venir !)');
-  document.getElementById('combat-status').style.display = 'block';
-  setTimeout(() => {
-    document.getElementById('combat-status').style.display = 'none';
-    showToast('⚔️ Système de combat en cours de développement !', 3500);
-  }, 2500);
+
+  if (isMe) {
+    div.onclick = (e) => { e.stopPropagation(); openBoardCardModal(cardData, el); };
+  }
+
+  el.appendChild(div);
+
+  // Clic sur emplacement vide pour y placer une carte
+  if (!cardData && isMe) {
+    el.onclick = () => placePendingCard(el);
+  }
+}
+
+// ===== INTERACTIONS MAIN =====
+function openHandCardModal(cid, idx) {
+  if (duelRole === 'spectator') return;
+  duelPendingCard = { cid, source: 'hand', sourceIdx: idx };
+  const img = document.getElementById('duel-modal-img');
+  img.src = cardImgSrc(cid);
+  document.getElementById('duel-modal-title').textContent = 'Carte en main';
+  document.getElementById('duel-modal-btns').innerHTML = `
+    <button class="duel-action-btn" onclick="startPlacement('attack')">⚔ Poser en attaque</button>
+    <button class="duel-action-btn" onclick="startPlacement('defense')">🛡 Poser en défense (pivotée)</button>
+    <button class="duel-action-btn" onclick="startPlacement('hidden')">🎭 Poser face cachée (pivotée)</button>
+    <button class="duel-action-btn-close" onclick="closeDuelModal()">Annuler</button>`;
+  document.getElementById('duel-card-modal').classList.add('active');
+}
+
+window.startPlacement = function(mode) {
+  duelPendingMode = mode;
+  closeDuelModal();
+  duelPickingSlot = true;
+  document.getElementById('slot-pick-hint').classList.add('active');
+  // Activer les slots comme cibles
+  document.querySelectorAll('#my-board .board-slot').forEach(slot => {
+    slot.classList.add('slot-target');
+    slot.onclick = () => placePendingCard(slot);
+  });
+};
+
+function cancelPlacement() {
+  duelPickingSlot = false;
+  duelPendingCard = null;
+  duelPendingMode = null;
+  document.getElementById('slot-pick-hint').classList.remove('active');
+  document.querySelectorAll('.board-slot').forEach(s => {
+    s.classList.remove('slot-target');
+    s.onclick = null;
+  });
+}
+
+async function placePendingCard(slotEl) {
+  if (!duelPickingSlot || !duelPendingCard) return;
+  const row = slotEl.getAttribute('data-row');
+  const slotIdx = parseInt(slotEl.getAttribute('data-slot'));
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+
+  // Vérifier que l'emplacement est libre
+  if (state.board[row][slotIdx]) { showToast('⚠️ Emplacement occupé !'); return; }
+
+  // Retirer la carte de la main
+  const cidToPlace = duelPendingCard.cid;
+  state.hand.splice(duelPendingCard.sourceIdx, 1);
+  // Poser sur le plateau
+  state.board[row][slotIdx] = { cid: cidToPlace, mode: duelPendingMode };
+
+  cancelPlacement();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+}
+
+// ===== INTERACTIONS PLATEAU =====
+function openBoardCardModal(cardData, slotEl) {
+  if (duelRole === 'spectator') return;
+  duelPendingCard = { cid: cardData.cid, source: 'board', slotEl };
+  const img = document.getElementById('duel-modal-img');
+  img.src = cardImgSrc(cardData.cid);
+  document.getElementById('duel-modal-title').textContent = 'Carte sur le plateau';
+  document.getElementById('duel-modal-btns').innerHTML = `
+    <button class="duel-action-btn" onclick="moveBoardCard('hand')">✋ Remettre en main</button>
+    <button class="duel-action-btn" onclick="moveBoardCard('deck')">🔀 Remettre dans le deck (aléatoire)</button>
+    <button class="duel-action-btn danger" onclick="moveBoardCard('cemetery')">💀 Envoyer au cimetière</button>
+    <button class="duel-action-btn-close" onclick="closeDuelModal()">Annuler</button>`;
+  document.getElementById('duel-card-modal').classList.add('active');
+}
+
+window.moveBoardCard = async function(destination) {
+  if (!duelPendingCard) return;
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+  const slotEl = duelPendingCard.slotEl;
+  const row = slotEl.getAttribute('data-row');
+  const idx = parseInt(slotEl.getAttribute('data-slot'));
+  const cid = duelPendingCard.cid;
+
+  state.board[row][idx] = null;
+  if (destination === 'hand') state.hand.push(cid);
+  else if (destination === 'cemetery') state.cemetery.push(cid);
+  else if (destination === 'deck') {
+    const pos = Math.floor(Math.random() * (state.deck.length + 1));
+    state.deck.splice(pos, 0, cid);
+  }
+
+  closeDuelModal();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+};
+
+// ===== DECK (piocher, mélanger, choisir) =====
+window.openDeckMenu = function() {
+  if (duelRole === 'spectator' || !duelState) return;
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = duelState[myKey];
+  const top = state?.deck?.[state.deck.length - 1];
+
+  document.getElementById('duel-modal-img').src = top ? cardImgSrc(top) : 'images/verso.jpg';
+  document.getElementById('duel-modal-title').textContent = `Deck (${state?.deck?.length || 0} cartes)`;
+  document.getElementById('duel-modal-btns').innerHTML = `
+    <button class="duel-action-btn" onclick="drawCard()">🃏 Piocher (dessus)</button>
+    <button class="duel-action-btn" onclick="shuffleDeck()">🔀 Mélanger</button>
+    <button class="duel-action-btn" onclick="openDeckBrowse()">🔍 Chercher une carte</button>
+    <button class="duel-action-btn-close" onclick="closeDuelModal()">Fermer</button>`;
+  document.getElementById('duel-card-modal').classList.add('active');
+};
+
+window.drawCard = async function() {
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+  if (!state.deck.length) { showToast('⚠️ Deck vide !'); return; }
+  const drawn = state.deck.pop();
+  state.hand.push(drawn);
+  closeDuelModal();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+};
+
+window.shuffleDeck = async function() {
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+  state.deck = shuffleArr(state.deck);
+  closeDuelModal();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+  showToast('🔀 Deck mélangé !');
+};
+
+window.openDeckBrowse = function() {
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = duelState[myKey];
+  if (!state?.deck?.length) { showToast('Deck vide !'); return; }
+
+  document.getElementById('duel-modal-title').textContent = 'Choisir une carte du deck';
+  const btns = state.deck.map((cid, idx) => {
+    const { type, num } = parseCardId(cid);
+    return `<button class="duel-action-btn" onclick="pickFromDeck(${idx})" style="display:flex;align-items:center;gap:8px;">
+      <img src="${cardImgSrc(cid)}" style="width:30px;height:42px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">
+      <span>${TYPE_ICONS[type]} ${cid}</span>
+    </button>`;
+  }).join('');
+  document.getElementById('duel-modal-btns').innerHTML = btns + `<button class="duel-action-btn-close" onclick="closeDuelModal()">Annuler</button>`;
+  document.getElementById('duel-modal-img').src = 'images/verso.jpg';
+};
+
+window.pickFromDeck = async function(idx) {
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+  const [picked] = state.deck.splice(idx, 1);
+  state.hand.push(picked);
+  closeDuelModal();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+};
+
+// ===== CIMETIÈRE =====
+window.openCemeteryMenu = function() {
+  if (duelRole === 'spectator' || !duelState) return;
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = duelState[myKey];
+  const top = state?.cemetery?.at(-1);
+  if (!top) { showToast('Cimetière vide !'); return; }
+
+  document.getElementById('duel-modal-img').src = cardImgSrc(top);
+  document.getElementById('duel-modal-title').textContent = `Cimetière (${state?.cemetery?.length || 0} cartes)`;
+  document.getElementById('duel-modal-btns').innerHTML = `
+    <button class="duel-action-btn" onclick="cemeteryToHand()">✋ Remettre en main (dessus)</button>
+    <button class="duel-action-btn" onclick="cemeteryToDeck()">🔀 Remettre dans le deck (aléatoire)</button>
+    <button class="duel-action-btn" onclick="openCemeteryBrowse()">🔍 Parcourir le cimetière</button>
+    <button class="duel-action-btn-close" onclick="closeDuelModal()">Fermer</button>`;
+  document.getElementById('duel-card-modal').classList.add('active');
+};
+
+window.cemeteryToHand = async function() {
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+  if (!state.cemetery.length) return;
+  const card = state.cemetery.pop();
+  state.hand.push(card);
+  closeDuelModal();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+};
+
+window.cemeteryToDeck = async function() {
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+  if (!state.cemetery.length) return;
+  const card = state.cemetery.pop();
+  const pos = Math.floor(Math.random() * (state.deck.length + 1));
+  state.deck.splice(pos, 0, card);
+  closeDuelModal();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+};
+
+window.openCemeteryBrowse = function() {
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = duelState[myKey];
+  if (!state?.cemetery?.length) { showToast('Cimetière vide !'); return; }
+
+  document.getElementById('duel-modal-title').textContent = 'Cimetière';
+  const btns = [...state.cemetery].reverse().map((cid, ri) => {
+    const actualIdx = state.cemetery.length - 1 - ri;
+    const { type } = parseCardId(cid);
+    return `<button class="duel-action-btn" onclick="pickFromCemetery(${actualIdx})" style="display:flex;align-items:center;gap:8px;">
+      <img src="${cardImgSrc(cid)}" style="width:30px;height:42px;object-fit:cover;border-radius:4px;border:1px solid var(--border)">
+      <span>${TYPE_ICONS[type]} ${cid}</span>
+    </button>`;
+  }).join('');
+  document.getElementById('duel-modal-btns').innerHTML = btns + `<button class="duel-action-btn-close" onclick="closeDuelModal()">Annuler</button>`;
+};
+
+window.pickFromCemetery = async function(idx) {
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+  const [picked] = state.cemetery.splice(idx, 1);
+  state.hand.push(picked);
+  closeDuelModal();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+};
+
+// ===== MODAL HELPERS =====
+window.closeDuelModal = function(e) {
+  if (e && e.target !== document.getElementById('duel-card-modal')) return;
+  document.getElementById('duel-card-modal').classList.remove('active');
+  if (!duelPickingSlot) duelPendingCard = null;
 };
 
 // ===== EXPOSE GLOBALS =====
+window.joinDuel = window.joinDuel;
+window.leaveDuel = window.leaveDuel;
+window.openDeckMenu = window.openDeckMenu;
+window.openCemeteryMenu = window.openCemeteryMenu;
 window.openBooster = window.openBooster;
 window.collectCards = window.collectCards;
 window.showTab = window.showTab;

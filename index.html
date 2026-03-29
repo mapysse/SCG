@@ -2786,6 +2786,27 @@ function shuffleArr(arr) {
   return a;
 }
 
+// Firebase convertit les arrays en objets {0:x,1:y} — on remet en vrais tableaux
+function normalizeState(state) {
+  if (!state) return state;
+  const toArr = v => v == null ? [] : Array.isArray(v) ? v : Object.values(v);
+  state.deck = toArr(state.deck);
+  state.hand = toArr(state.hand);
+  state.cemetery = toArr(state.cemetery);
+  if (state.board) {
+    for (const row of ['perso','objet','piege']) {
+      if (state.board[row]) {
+        // board rows sont des tableaux de 3 slots (peuvent être null)
+        const raw = state.board[row];
+        state.board[row] = Array.isArray(raw) ? raw : [raw[0]||null, raw[1]||null, raw[2]||null];
+      } else {
+        state.board[row] = [null, null, null];
+      }
+    }
+  }
+  return state;
+}
+
 window.joinDuel = async function() {
   const code = document.getElementById('duel-code-input').value.trim().toUpperCase();
   if (!code) { showToast('⚠️ Entre un code de partie !'); return; }
@@ -2840,7 +2861,11 @@ window.joinDuel = async function() {
   // Écoute en temps réel
   duelUnsub = onValue(ref(db, `duels/${code}`), snap => {
     if (!snap.exists()) return;
-    duelState = snap.val();
+    const raw = snap.val();
+    // Firebase convertit les tableaux en objets — on normalise
+    if (raw.p1State) raw.p1State = normalizeState(raw.p1State);
+    if (raw.p2State) raw.p2State = normalizeState(raw.p2State);
+    duelState = raw;
     renderBoard();
   });
 

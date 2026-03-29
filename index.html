@@ -1532,8 +1532,8 @@
   .duel-modal-inner {
     background: linear-gradient(145deg, var(--surface2), var(--surface));
     border: 1px solid var(--border); border-radius: 18px; padding: 22px;
-    display: flex; gap: 18px; align-items: flex-start;
-    max-width: 440px; width: 92%;
+    display: flex; gap: 20px; align-items: flex-start;
+    max-width: 560px; width: 95%;
     box-shadow: 0 20px 60px rgba(0,0,0,0.6);
     position: relative;
   }
@@ -1546,9 +1546,11 @@
   }
 
   .duel-modal-card {
-    width: 100px; height: 140px; border-radius: 9px; overflow: hidden;
-    flex-shrink: 0; border: 1px solid rgba(201,168,76,0.3);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    width: 180px;
+    height: 252px;
+    border-radius: 12px; overflow: hidden;
+    flex-shrink: 0; border: 2px solid rgba(201,168,76,0.35);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
   }
   .duel-modal-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -3125,10 +3127,9 @@ window.handToCemetery = async function(idx) {
 
 window.startPlacement = function(mode) {
   duelPendingMode = mode;
+  duelPickingSlot = true; // AVANT closeDuelModal pour que duelPendingCard ne soit pas null
   closeDuelModal();
-  duelPickingSlot = true;
   document.getElementById('slot-pick-hint').classList.add('active');
-  // Activer les slots comme cibles
   document.querySelectorAll('#my-board .board-slot').forEach(slot => {
     slot.classList.add('slot-target');
     slot.onclick = () => placePendingCard(slot);

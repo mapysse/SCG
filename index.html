@@ -2900,20 +2900,33 @@ function shuffleArr(arr) {
 // Firebase convertit les arrays en objets {0:x,1:y} — on remet en vrais tableaux
 function normalizeState(state) {
   if (!state) return state;
-  const toArr = v => v == null ? [] : Array.isArray(v) ? v : Object.values(v);
+
+  // Convertit valeur Firebase en vrai tableau, filtre le placeholder
+  const toArr = v => {
+    if (v == null) return [];
+    let arr = Array.isArray(v) ? v : Object.values(v);
+    return arr.filter(x => x !== '__placeholder__');
+  };
+
   state.deck = toArr(state.deck);
   state.hand = toArr(state.hand);
   state.cemetery = toArr(state.cemetery);
-  if (state.board) {
-    for (const row of ['perso','objet','piege']) {
-      if (state.board[row]) {
-        // board rows sont des tableaux de 3 slots (peuvent être null)
-        const raw = state.board[row];
-        state.board[row] = Array.isArray(raw) ? raw : [raw[0]||null, raw[1]||null, raw[2]||null];
-      } else {
-        state.board[row] = [null, null, null];
-      }
+
+  if (!state.board) state.board = {};
+  for (const row of ['perso','objet','piege']) {
+    const raw = state.board[row];
+    let slots;
+    if (!raw) {
+      slots = ['', '', ''];
+    } else if (Array.isArray(raw)) {
+      slots = raw;
+    } else {
+      slots = [raw[0] ?? '', raw[1] ?? '', raw[2] ?? ''];
     }
+    // Normaliser : '' = vide (null logique), objet = carte posée
+    state.board[row] = slots.map(s => (s === '' || s == null) ? null : s);
+    // S'assurer qu'il y a bien 3 slots
+    while (state.board[row].length < 3) state.board[row].push(null);
   }
   return state;
 }
@@ -2929,33 +2942,31 @@ window.joinDuel = async function() {
   const existing = await dbGet(`duels/${code}`);
 
   if (!existing) {
-    // Créer la partie (p1)
     duelRole = 'p1';
     const myDeck = shuffleArr(decks[1]);
     const initState = {
       code,
       p1: currentUser.username,
       p2: null,
-      status: 'waiting', // waiting | playing
+      status: 'waiting',
       p1State: {
         deck: myDeck,
-        hand: [],
-        board: { perso: [null,null,null], objet: [null,null,null], piege: [null,null,null] },
-        cemetery: []
+        hand: ['__placeholder__'], // évite que Firebase supprime le champ vide
+        board: { perso: ['','',''], objet: ['','',''], piege: ['','',''] },
+        cemetery: ['__placeholder__']
       },
       p2State: null,
       createdAt: Date.now()
     };
     await dbSet(`duels/${code}`, initState);
   } else if (!existing.p2) {
-    // Rejoindre en p2
     duelRole = 'p2';
     const myDeck = shuffleArr(decks[1]);
     const p2State = {
       deck: myDeck,
-      hand: [],
-      board: { perso: [null,null,null], objet: [null,null,null], piege: [null,null,null] },
-      cemetery: []
+      hand: ['__placeholder__'],
+      board: { perso: ['','',''], objet: ['','',''], piege: ['','',''] },
+      cemetery: ['__placeholder__']
     };
     await dbUpdate(`duels/${code}`, { p2: currentUser.username, p2State, status: 'playing' });
   } else {
@@ -3023,7 +3034,7 @@ function renderBoard() {
     }
   }
 
-  // Si on est en mode placement, ré-activer les slots après re-render
+  // APRÈS le rendu : réactiver les slots si on est en mode placement
   if (duelPickingSlot) activateSlotTargets();
 
   updatePile('my-deck-count', myState?.deck?.length || 0);
@@ -3069,13 +3080,18 @@ function renderHand(containerId, hand, hidden) {
 
 function renderSlot(el, cardData, isMe) {
   el.innerHTML = '';
-  // Réinitialiser le onclick (sera réassigné par startPlacement si besoin)
-  el.onclick = null;
 
   if (!cardData) {
-    // Slot vide — le onclick sera géré par startPlacement via slot-target
+    // Slot vide : le onclick sera géré par activateSlotTargets si en mode placement
+    // On ne touche PAS au onclick ici
+    el.classList.remove('slot-target');
+    if (!duelPickingSlot) el.onclick = null;
     return;
   }
+
+  // Slot occupé : désactiver le slot-target si présent
+  el.classList.remove('slot-target');
+  if (!duelPickingSlot) el.onclick = null;
 
   const div = document.createElement('div');
   const isHidden = cardData.mode === 'hidden';
@@ -3167,6 +3183,8 @@ async function placePendingCard(slotEl) {
   cancelPlacement();
 
   state.hand.splice(handIdx, 1);
+  // On pousse un placeholder si la main est vide pour éviter que Firebase supprime le champ
+  if (state.hand.length === 0) state.hand.push('__placeholder__');
   state.board[row][slotIdx] = { cid: cidToPlace, mode };
 
   await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
@@ -3218,10 +3236,14 @@ window.moveBoardCard = async function(destination) {
   const idx = parseInt(slotEl.getAttribute('data-slot'));
   const cid = duelPendingCard.cid;
 
-  state.board[row][idx] = null;
-  if (destination === 'hand') state.hand.push(cid);
-  else if (destination === 'cemetery') state.cemetery.push(cid);
-  else if (destination === 'deck') {
+  state.board[row][idx] = '';  // '' au lieu de null pour éviter que Firebase supprime la clé
+  if (destination === 'hand') {
+    state.hand.push(cid);
+    state.hand = state.hand.filter(x => x !== '__placeholder__');
+  } else if (destination === 'cemetery') {
+    state.cemetery.push(cid);
+    state.cemetery = state.cemetery.filter(x => x !== '__placeholder__');
+  } else if (destination === 'deck') {
     const pos = Math.floor(Math.random() * (state.deck.length + 1));
     state.deck.splice(pos, 0, cid);
   }

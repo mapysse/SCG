@@ -3023,13 +3023,8 @@ function renderBoard() {
     }
   }
 
-  // Si on est en mode placement, ré-activer les slots cibles après le re-render
-  if (duelPickingSlot) {
-    document.querySelectorAll('#my-board .board-slot').forEach(slot => {
-      slot.classList.add('slot-target');
-      slot.onclick = () => placePendingCard(slot);
-    });
-  }
+  // Si on est en mode placement, ré-activer les slots après re-render
+  if (duelPickingSlot) activateSlotTargets();
 
   updatePile('my-deck-count', myState?.deck?.length || 0);
   updatePile('enemy-deck-count', enemyState?.deck?.length || 0);
@@ -3127,14 +3122,19 @@ window.handToCemetery = async function(idx) {
 
 window.startPlacement = function(mode) {
   duelPendingMode = mode;
-  duelPickingSlot = true; // AVANT closeDuelModal pour que duelPendingCard ne soit pas null
-  closeDuelModal();
+  // Fermer le modal SANS remettre duelPendingCard à null
+  document.getElementById('duel-card-modal').classList.remove('active');
+  duelPickingSlot = true;
   document.getElementById('slot-pick-hint').classList.add('active');
+  activateSlotTargets();
+};
+
+function activateSlotTargets() {
   document.querySelectorAll('#my-board .board-slot').forEach(slot => {
     slot.classList.add('slot-target');
-    slot.onclick = () => placePendingCard(slot);
+    slot.onclick = (e) => { e.stopPropagation(); placePendingCard(slot); };
   });
-};
+}
 
 function cancelPlacement() {
   duelPickingSlot = false;
@@ -3148,22 +3148,27 @@ function cancelPlacement() {
 }
 
 async function placePendingCard(slotEl) {
-  if (!duelPickingSlot || !duelPendingCard) return;
+  if (!duelPickingSlot || !duelPendingCard) {
+    console.warn('placePendingCard: état invalide', { duelPickingSlot, duelPendingCard });
+    return;
+  }
   const row = slotEl.getAttribute('data-row');
   const slotIdx = parseInt(slotEl.getAttribute('data-slot'));
   const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
   const state = JSON.parse(JSON.stringify(duelState[myKey]));
 
-  // Vérifier que l'emplacement est libre
   if (state.board[row][slotIdx]) { showToast('⚠️ Emplacement occupé !'); return; }
 
-  // Retirer la carte de la main
   const cidToPlace = duelPendingCard.cid;
-  state.hand.splice(duelPendingCard.sourceIdx, 1);
-  // Poser sur le plateau
-  state.board[row][slotIdx] = { cid: cidToPlace, mode: duelPendingMode };
+  const handIdx = duelPendingCard.sourceIdx;
+  const mode = duelPendingMode;
 
+  // Annuler AVANT dbUpdate pour éviter que renderBoard réactive des slots
   cancelPlacement();
+
+  state.hand.splice(handIdx, 1);
+  state.board[row][slotIdx] = { cid: cidToPlace, mode };
+
   await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
 }
 
@@ -3354,10 +3359,9 @@ window.pickFromCemetery = async function(idx) {
 
 // ===== MODAL HELPERS =====
 window.closeDuelModal = function(e) {
-  // Si appelé avec un event (clic sur le fond), ne fermer que si clic sur le fond lui-même
   if (e instanceof Event && e.target !== document.getElementById('duel-card-modal')) return;
   document.getElementById('duel-card-modal').classList.remove('active');
-  if (!duelPickingSlot) duelPendingCard = null;
+  // Ne PAS toucher duelPendingCard ici — cancelPlacement s'en charge si besoin
 };
 
 window.copyCode = function() {

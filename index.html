@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Souyette Card Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --gold-dark: #8a6820;
+    --deep: #0a0a14;
+    --surface: #111122;
+    --surface2: #181830;
+    --surface3: #20203a;
+    --accent: #4a90d9;
+    --accent2: #9b59b6;
+    --danger: #e74c3c;
+    --success: #27ae60;
+    --text: #e8e0d0;
+    --text-muted: #9090a0;
+    --border: rgba(201,168,76,0.25);
+    --glow: 0 0 20px rgba(201,168,76,0.3);
+    --card-w: 100px;
+    --card-h: 140px;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Raleway', sans-serif;
+    background: var(--deep);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(74,144,217,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(155,89,182,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== AUTH SCREEN ===== */
+  #auth-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    background: var(--deep);
+  }
+
+  .auth-box {
+    background: linear-gradient(145deg, var(--surface2), var(--surface));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 380px;
+    box-shadow: 0 0 60px rgba(201,168,76,0.15), 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .auth-logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .auth-logo h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 22px;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(201,168,76,0.5);
+    line-height: 1.3;
+  }
+
+  .auth-logo .subtitle {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  .auth-tabs {
+    display: flex;
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+  }
+
+  .auth-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    color: var(--text-muted);
+  }
+
+  .auth-tab.active {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--deep);
+  }
+
+  .auth-form { display: none; flex-direction: column; gap: 16px; }
+  .auth-form.active { display: flex; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .form-group label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .form-group input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .form-group input:focus { border-color: var(--gold); }
+
+  .btn-auth {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    color: var(--deep);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 8px;
+  }
+
+  .btn-auth:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(201,168,76,0.4);
+  }
+
+  .auth-error {
+    background: rgba(231,76,60,0.15);
+    border: 1px solid rgba(231,76,60,0.4);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #e74c3c;
+    display: none;
+  }
+
+  /* ===== MAIN APP ===== */
+  #app { display: none; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* ===== HEADER ===== */
+  header {
+    background: linear-gradient(180deg, rgba(10,10,20,0.98), rgba(10,10,20,0.85));
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+
+  .header-logo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 18px;
+    color: var(--gold);
+    text-shadow: 0 0 15px rgba(201,168,76,0.4);
+    letter-spacing: 1px;
+  }
+
+  .header-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .header-user span { color: var(--gold); font-weight: 600; }
+
+  .btn-logout {
+    background: rgba(231,76,60,0.15);
+    border: 1px solid rgba(231,76,60,0.3);
+    border-radius: 6px;
+    padding: 6px 14px;
+    color: #e74c3c;
+    font-size: 12px;
+    font-family: 'Raleway', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+  }
+
+  .btn-logout:hover { background: rgba(231,76,60,0.3); }
+
+  /* ===== NAVIGATION ===== */
+  nav {
+    background: rgba(17,17,34,0.9);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 16px;
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-tab {
+    padding: 10px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    transition: all 0.3s;
+    border: 1px solid transparent;
+    position: relative;
+    text-transform: uppercase;
+  }
+
+  .nav-tab:hover { color: var(--gold); background: rgba(201,168,76,0.06); }
+
+  .nav-tab.active {
+    color: var(--gold);
+    background: rgba(201,168,76,0.1);
+    border-color: var(--border);
+  }
+
+  .nav-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* ===== TAB CONTENT ===== */
+  .tab-content { display: none; flex: 1; padding: 28px 24px; animation: fadeIn 0.4s ease; }
+  .tab-content.active { display: block; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ===== BOOSTER TAB ===== */
+  .booster-arena {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .tab-title {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    color: var(--gold);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+
+  .tab-subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 32px;
+    letter-spacing: 1px;
+  }
+
+  .booster-row {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+
+  .booster-card {
+    background: linear-gradient(145deg, var(--surface2), var(--surface3));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 20px 20px;
+    text-align: center;
+    width: 220px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .booster-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.06), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .booster-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(201,168,76,0.2); }
+  .booster-card:hover::before { opacity: 1; }
+
+  .booster-img-wrap {
+    width: 130px;
+    height: 180px;
+    margin: 0 auto 16px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .booster-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+  }
+
+  .booster-card:hover .booster-img-wrap img { transform: scale(1.05); }
+
+  .booster-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--surface3), var(--surface2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: var(--gold);
+  }
+
+  .booster-name {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+  }
+
+  .booster-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  .btn-open-booster {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    color: var(--deep);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+  }
+
+  .btn-open-booster:hover { box-shadow: 0 6px 20px rgba(201,168,76,0.4); filter: brightness(1.1); }
+
+  /* ===== BOOSTER OPENING ANIMATION ===== */
+  #booster-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 500;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  #booster-overlay.active { display: flex; }
+
+  .reveal-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 24px;
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(201,168,76,0.6);
+    animation: pulse 1.5s ease-in-out infinite;
+    letter-spacing: 3px;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+  .cards-reveal-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 900px;
+    padding: 0 20px;
+  }
+
+  .reveal-card {
+    width: var(--card-w);
+    height: var(--card-h);
+    border-radius: var(--radius);
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    perspective: 600px;
+  }
+
+  .reveal-card.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: hidden;
+  }
+
+  .card-back {
+    background: linear-gradient(135deg, #1a1a35, #2a2a50);
+    border: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 11px;
+    color: var(--gold);
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  }
+
+  .card-back::before {
+    content: '✦';
+    position: absolute;
+    font-size: 40px;
+    color: rgba(201,168,76,0.1);
+  }
+
+  .card-front {
+    transform: rotateY(180deg);
+    border: 2px solid var(--gold);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  }
+
+  .card-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-front .card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--surface3), var(--surface2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .card-front .card-img-placeholder .card-type-icon { font-size: 24px; }
+  .card-front .card-img-placeholder .card-num { font-size: 9px; color: var(--gold); font-family: 'Cinzel', serif; }
+
+  .btn-collect {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border: none;
+    border-radius: 10px;
+    padding: 14px 40px;
+    color: var(--deep);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: none;
+  }
+
+  .btn-collect.visible { display: block; }
+  .btn-collect:hover { box-shadow: 0 8px 25px rgba(201,168,76,0.4); transform: translateY(-2px); }
+
+  /* ===== FILTER BAR ===== */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-right: 4px;
+    font-weight: 600;
+  }
+
+  .filter-btn {
+    padding: 7px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 1px;
+  }
+
+  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-btn.active { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--gold); }
+
+  /* ===== COLLECTION GRID ===== */
+  .ext-section { margin-bottom: 36px; }
+
+  .ext-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ext-badge {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--deep);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 2px;
+  }
+
+  .ext-title {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .ext-count { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+  .cards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .coll-card {
+    width: var(--card-w);
+    position: relative;
+    cursor: default;
+    transition: transform 0.3s;
+  }
+
+  .coll-card:hover { transform: translateY(-4px); z-index: 5; }
+
+  .coll-card img {
+    width: 100%;
+    height: var(--card-h);
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 2px solid var(--border);
+    display: block;
+  }
+
+  .coll-card .card-placeholder {
+    width: 100%;
+    height: var(--card-h);
+    border-radius: var(--radius);
+    border: 2px solid var(--border);
+    background: linear-gradient(135deg, var(--surface2), var(--surface3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .coll-card .card-placeholder .type-icon { font-size: 28px; }
+
+  .card-count-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: var(--gold);
+    color: var(--deep);
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Cinzel', serif;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+  .empty-state h3 { font-family: 'Cinzel', serif; color: var(--text-muted); margin-bottom: 8px; font-size: 16px; }
+  .empty-state p { font-size: 13px; line-height: 1.6; }
+
+  /* ===== DECK TAB ===== */
+  .deck-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
+  }
+
+  .deck-panel {
+    background: linear-gradient(145deg, var(--surface2), var(--surface));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .deck-panel-title {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  .deck-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    min-height: 160px;
+  }
+
+  .deck-slot {
+    width: 80px;
+    height: 112px;
+    border: 2px dashed rgba(201,168,76,0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: rgba(201,168,76,0.15);
+    position: relative;
+    transition: border-color 0.3s;
+  }
+
+  .deck-slot.filled { border: none; }
+  .deck-slot.filled img {
+    width: 80px;
+    height: 112px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    display: block;
+    cursor: pointer;
+    transition: filter 0.3s;
+  }
+
+  .deck-slot.filled img:hover { filter: brightness(0.7); }
+  .deck-slot.filled .slot-placeholder { width: 80px; height: 112px; }
+
+  .deck-card-wrap { position: relative; }
+
+  .deck-remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--danger);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    color: white;
+    font-size: 11px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .deck-card-wrap:hover .deck-remove-btn { display: flex; }
+
+  .deck-count-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .deck-count-bar {
+    height: 6px;
+    background: var(--surface3);
+    border-radius: 3px;
+    flex: 1;
+    margin: 0 12px;
+    overflow: hidden;
+  }
+
+  .deck-count-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+    border-radius: 3px;
+    transition: width 0.4s;
+  }
+
+  .deck-count-text { font-size: 13px; color: var(--gold); font-family: 'Cinzel', serif; font-weight: 600; }
+
+  .coll-card.in-deck img, .coll-card.in-deck .card-placeholder { border-color: var(--gold) !important; box-shadow: 0 0 10px rgba(201,168,76,0.3); }
+
+  .coll-card .add-to-deck-btn {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--deep);
+    border: none;
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    white-space: nowrap;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.5px;
+  }
+
+  .coll-card:hover .add-to-deck-btn { display: block; }
+  .coll-card.maxed .add-to-deck-btn { background: var(--text-muted); cursor: not-allowed; }
+
+  .btn-save-deck {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border: none;
+    border-radius: 10px;
+    padding: 12px 24px;
+    color: var(--deep);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .btn-save-deck:hover { box-shadow: 0 6px 20px rgba(201,168,76,0.4); filter: brightness(1.1); }
+  .btn-save-deck:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ===== COMBAT TAB ===== */
+  .combat-center {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .combat-box {
+    background: linear-gradient(145deg, var(--surface2), var(--surface));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .combat-box::before {
+    content: '⚔';
+    position: absolute;
+    font-size: 120px;
+    color: rgba(201,168,76,0.04);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .combat-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 20px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .combat-subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .combat-code-display {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .your-code-label { font-size: 11px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
+  .your-code-value { font-family: 'Cinzel', serif; font-size: 22px; color: var(--gold); letter-spacing: 4px; font-weight: 700; }
+
+  .btn-copy {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-copy:hover { border-color: var(--gold); color: var(--gold); }
+
+  .combat-enter {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .combat-enter input {
+    flex: 1;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    letter-spacing: 4px;
+    outline: none;
+    text-align: center;
+    text-transform: uppercase;
+    transition: border-color 0.3s;
+  }
+
+  .combat-enter input:focus { border-color: var(--gold); }
+
+  .btn-duel {
+    background: linear-gradient(135deg, #8b0000, var(--danger));
+    border: none;
+    border-radius: 8px;
+    padding: 14px 24px;
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+
+  .btn-duel:hover { box-shadow: 0 6px 20px rgba(231,76,60,0.4); transform: translateY(-2px); }
+
+  .no-deck-warning {
+    background: rgba(231,76,60,0.1);
+    border: 1px solid rgba(231,76,60,0.3);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ===== TOAST ===== */
+  #toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--surface2);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    padding: 14px 20px;
+    color: var(--gold);
+    font-size: 13px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    z-index: 9999;
+    transform: translateX(150%);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    max-width: 300px;
+  }
+
+  #toast.show { transform: translateX(0); }
+
+  /* ===== LOADING ===== */
+  .loader {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(201,168,76,0.3);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: auto;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== SCROLL ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    :root { --card-w: 88px; --card-h: 124px; }
+    .deck-layout { grid-template-columns: 1fr; }
+    .booster-row { gap: 16px; }
+    .booster-card { width: 160px; }
+    .nav-tab { padding: 8px 14px; font-size: 11px; }
+    header { padding: 0 12px; }
+    .tab-content { padding: 20px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <h1>Souyette<br>Card Game</h1>
+      <div class="subtitle">✦ Collectible Card Universe ✦</div>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Connexion</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">Créer un compte</div>
+    </div>
+    <form class="auth-form active" id="login-form" onsubmit="return false;">
+      <div class="form-group">
+        <label>Nom d'invocateur</label>
+        <input type="text" id="login-username" placeholder="Ton pseudo" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button class="btn-auth" onclick="doLogin()">Entrer dans l'arène</button>
+    </form>
+    <form class="auth-form" id="register-form" onsubmit="return false;">
+      <div class="form-group">
+        <label>Nom d'invocateur</label>
+        <input type="text" id="reg-username" placeholder="Ton pseudo">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" id="reg-pass" placeholder="Min. 6 caractères">
+      </div>
+      <div class="auth-error" id="reg-error"></div>
+      <button class="btn-auth" onclick="doRegister()">Créer mon compte</button>
+    </form>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <header>
+    <div class="header-logo">✦ SCG</div>
+    <div class="header-user">
+      Invocateur : <span id="header-username">—</span>
+      <button class="btn-logout" onclick="doLogout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <nav>
+    <div class="nav-tab active" onclick="showTab('boosters')">🎴 Boosters</div>
+    <div class="nav-tab" onclick="showTab('collection')">📚 Collection</div>
+    <div class="nav-tab" onclick="showTab('deck')">⚔️ Deck</div>
+    <div class="nav-tab" onclick="showTab('combat')">🏆 Combat</div>
+  </nav>
+
+  <!-- ===== TAB: BOOSTERS ===== -->
+  <div class="tab-content active" id="tab-boosters">
+    <div class="booster-arena">
+      <div class="tab-title">Ouvrir des Boosters</div>
+      <div class="tab-subtitle">Chaque booster contient 5 cartes aléatoires de son extension</div>
+      <div class="booster-row">
+        <div class="booster-card" onclick="openBooster('OG')">
+          <div class="booster-img-wrap">
+            <img src="images/booster_OG.jpg" alt="Booster OG" onerror="this.parentElement.innerHTML='<div class=\'booster-img-placeholder\'>⭐</div>'">
+          </div>
+          <div class="booster-name">OG</div>
+          <div class="booster-desc">Extension Originale<br>Les cartes fondatrices</div>
+          <button class="btn-open-booster">Ouvrir</button>
+        </div>
+        <div class="booster-card" onclick="openBooster('PR')">
+          <div class="booster-img-wrap">
+            <img src="images/booster_PR.jpg" alt="Booster PR" onerror="this.parentElement.innerHTML='<div class=\'booster-img-placeholder\'>🌟</div>'">
+          </div>
+          <div class="booster-name">PR</div>
+          <div class="booster-desc">Extension Primordiale<br>Pouvoirs anciens</div>
+          <button class="btn-open-booster">Ouvrir</button>
+        </div>
+        <div class="booster-card" onclick="openBooster('TE')">
+          <div class="booster-img-wrap">
+            <img src="images/booster_TE.jpg" alt="Booster TE" onerror="this.parentElement.innerHTML='<div class=\'booster-img-placeholder\'>💫</div>'">
+          </div>
+          <div class="booster-name">TE</div>
+          <div class="booster-desc">Extension Temporelle<br>Cartes du futur</div>
+          <button class="btn-open-booster">Ouvrir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB: COLLECTION ===== -->
+  <div class="tab-content" id="tab-collection">
+    <div class="tab-title">Ma Collection</div>
+    <div class="tab-subtitle">Toutes tes cartes obtenues classées par extension</div>
+    <div class="filter-bar">
+      <span class="filter-label">Extension :</span>
+      <button class="filter-btn active" onclick="filterColl('ext','all',this)">Toutes</button>
+      <button class="filter-btn" onclick="filterColl('ext','OG',this)">OG</button>
+      <button class="filter-btn" onclick="filterColl('ext','PR',this)">PR</button>
+      <button class="filter-btn" onclick="filterColl('ext','TE',this)">TE</button>
+      <span class="filter-label" style="margin-left:12px;">Type :</span>
+      <button class="filter-btn active" onclick="filterColl('type','all',this)" data-group="type">Tous</button>
+      <button class="filter-btn" onclick="filterColl('type','perso',this)" data-group="type">👤 Personnage</button>
+      <button class="filter-btn" onclick="filterColl('type','objet',this)" data-group="type">🎒 Objet</button>
+      <button class="filter-btn" onclick="filterColl('type','piege',this)" data-group="type">⚡ Piège</button>
+    </div>
+    <div id="collection-grid"></div>
+  </div>
+
+  <!-- ===== TAB: DECK ===== -->
+  <div class="tab-content" id="tab-deck">
+    <div class="tab-title">Construire mon Deck</div>
+    <div class="tab-subtitle">25 cartes max • 2 exemplaires max par carte</div>
+    <div class="deck-layout">
+      <div>
+        <div class="filter-bar">
+          <span class="filter-label">Extension :</span>
+          <button class="filter-btn active" onclick="filterDeck('ext','all',this)">Toutes</button>
+          <button class="filter-btn" onclick="filterDeck('ext','OG',this)">OG</button>
+          <button class="filter-btn" onclick="filterDeck('ext','PR',this)">PR</button>
+          <button class="filter-btn" onclick="filterDeck('ext','TE',this)">TE</button>
+          <span class="filter-label" style="margin-left:12px;">Type :</span>
+          <button class="filter-btn active" onclick="filterDeck('type','all',this)" data-group="dtype">Tous</button>
+          <button class="filter-btn" onclick="filterDeck('type','perso',this)" data-group="dtype">👤</button>
+          <button class="filter-btn" onclick="filterDeck('type','objet',this)" data-group="dtype">🎒</button>
+          <button class="filter-btn" onclick="filterDeck('type','piege',this)" data-group="dtype">⚡</button>
+        </div>
+        <div id="deck-collection-grid"></div>
+      </div>
+      <div>
+        <div class="deck-panel">
+          <div class="deck-panel-title">✦ Mon Deck</div>
+          <div class="deck-slots" id="deck-slots"></div>
+          <div class="deck-count-info">
+            <span class="deck-count-text" id="deck-count-text">0/25</span>
+            <div class="deck-count-bar"><div class="deck-count-fill" id="deck-count-fill" style="width:0%"></div></div>
+          </div>
+          <button class="btn-save-deck" onclick="saveDeck()">💾 Sauvegarder le Deck</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB: COMBAT ===== -->
+  <div class="tab-content" id="tab-combat">
+    <div class="combat-center">
+      <div class="tab-title" style="text-align:center;margin-bottom:8px;">Arène de Combat</div>
+      <div class="tab-subtitle" style="text-align:center;margin-bottom:28px;">Défie un autre invocateur en partageant ton code</div>
+      <div class="combat-box">
+        <div class="combat-title">Ton Code de Combat</div>
+        <div class="combat-subtitle">Partage ce code avec ton adversaire pour qu'il puisse te rejoindre</div>
+        <div class="combat-code-display">
+          <div>
+            <div class="your-code-label">Ton code</div>
+            <div class="your-code-value" id="combat-code">------</div>
+          </div>
+          <button class="btn-copy" onclick="copyCode()">📋 Copier</button>
+        </div>
+        <div id="no-deck-warn" class="no-deck-warning" style="display:none;margin-bottom:20px;">
+          ⚠️ Tu dois d'abord construire et sauvegarder un deck de 25 cartes avant de pouvoir combattre !
+        </div>
+        <div class="combat-enter">
+          <input type="text" id="enemy-code" placeholder="CODE ADVERSE" maxlength="6">
+          <button class="btn-duel" onclick="startDuel()">⚔️ Duel !</button>
+        </div>
+      </div>
+      <div id="combat-status" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center;">
+        <div style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin-bottom:8px;">Recherche d'adversaire...</div>
+        <div style="color:var(--text-muted);font-size:13px;margin-bottom:20px;">En attente que l'adversaire rejoigne le duel</div>
+        <div class="loader"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOSTER OVERLAY -->
+<div id="booster-overlay">
+  <div class="reveal-title" id="reveal-title">Touche les cartes pour les révéler !</div>
+  <div class="cards-reveal-row" id="cards-reveal-row"></div>
+  <button class="btn-collect" id="btn-collect" onclick="collectCards()">✦ Récupérer mes cartes</button>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set, update, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBl6tzfUNRv1BaUc7ftnOKVug3l7UsjG2A",
+  authDomain: "scgp-b607d.firebaseapp.com",
+  databaseURL: "https://scgp-b607d-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "scgp-b607d",
+  storageBucket: "scgp-b607d.firebasestorage.app",
+  messagingSenderId: "658409580326",
+  appId: "1:658409580326:web:146ffe1a16bdd2a05983e7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Hash SHA-256 du mot de passe (jamais stocké en clair)
+async function hashPassword(password) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Helpers DB
+async function dbGet(path) {
+  const snap = await get(ref(db, path));
+  return snap.exists() ? snap.val() : null;
+}
+async function dbSet(path, value) { await set(ref(db, path), value); }
+async function dbUpdate(path, value) { await update(ref(db, path), value); }
+
+// ===== GAME CONFIG =====
+const EXTENSIONS = ['OG','PR','TE'];
+const TYPES = ['perso','objet','piege'];
+const CARDS_PER_EXT = { OG: { perso:10, objet:8, piege:7 }, PR: { perso:10, objet:8, piege:7 }, TE: { perso:10, objet:8, piege:7 } };
+const CARDS_PER_BOOSTER = 5;
+const MAX_DECK = 25;
+const MAX_COPIES = 2;
+
+const TYPE_ICONS = { perso:'👤', objet:'🎒', piege:'⚡' };
+const TYPE_LABELS = { perso:'Personnage', objet:'Objet', piege:'Piège' };
+const EXT_NAMES = { OG:'Extension Originale', PR:'Extension Primordiale', TE:'Extension Temporelle' };
+
+// ===== STATE =====
+let currentUser = null;   // { username, combatCode }
+let collection = {};
+let deck = [];
+let pendingCards = [];
+let collFilterExt = 'all';
+let collFilterType = 'all';
+let deckFilterExt = 'all';
+let deckFilterType = 'all';
+
+// ===== HELPERS =====
+function cardId(ext, type, num) {
+  return `${ext}_${type}_${String(num).padStart(3,'0')}`;
+}
+
+function parseCardId(id) {
+  const parts = id.split('_');
+  return { ext: parts[0], type: parts[1], num: parseInt(parts[2]) };
+}
+
+function cardImgSrc(id) {
+  const { ext, type, num } = parseCardId(id);
+  return `images/${ext}/${ext}_${type}/${ext}_${type}_${String(num).padStart(3,'0')}.jpg`;
+}
+
+function randomCard(ext) {
+  const pool = [];
+  for (const type of TYPES) {
+    const max = CARDS_PER_EXT[ext][type];
+    for (let i=1; i<=max; i++) pool.push(cardId(ext, type, i));
+  }
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function generateCombatCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i=0; i<6; i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+// Persist session in localStorage
+function saveSession(username) { localStorage.setItem('scg_user', username); }
+function loadSession() { return localStorage.getItem('scg_user'); }
+function clearSession() { localStorage.removeItem('scg_user'); }
+
+window.showToast = function(msg, dur=2800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+};
+
+// ===== AUTH =====
+window.switchAuthTab = function(tab) {
+  document.querySelectorAll('.auth-tab').forEach((el,i) => {
+    el.classList.toggle('active', (tab==='login' && i===0)||(tab==='register' && i===1));
+  });
+  document.getElementById('login-form').classList.toggle('active', tab==='login');
+  document.getElementById('register-form').classList.toggle('active', tab==='register');
+};
+
+async function loginUser(username, data) {
+  currentUser = { username: data.username, combatCode: data.combatCode };
+  collection = data.collection || {};
+  deck = data.deck || [];
+  saveSession(username);
+  document.getElementById('header-username').textContent = data.username;
+  document.getElementById('combat-code').textContent = data.combatCode || '------';
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  renderCollection();
+  renderDeckCollection();
+  renderDeckSlots();
+  checkDeckForCombat();
+}
+
+window.doLogin = async function() {
+  const username = document.getElementById('login-username').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!username || !pass) { errEl.textContent = 'Remplis tous les champs'; errEl.style.display='block'; return; }
+  try {
+    const userData = await dbGet(`users/${username}`);
+    if (!userData) { errEl.textContent = 'Pseudo introuvable'; errEl.style.display='block'; return; }
+    const hashed = await hashPassword(pass);
+    if (userData.password !== hashed) { errEl.textContent = 'Mot de passe incorrect'; errEl.style.display='block'; return; }
+    await loginUser(username, userData);
+  } catch(e) {
+    errEl.textContent = 'Erreur de connexion, réessaie.';
+    errEl.style.display = 'block';
+  }
+};
+
+window.doRegister = async function() {
+  const username = document.getElementById('reg-username').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const errEl = document.getElementById('reg-error');
+  errEl.style.display = 'none';
+  if (!username) { errEl.textContent = 'Choisis un nom d\'invocateur'; errEl.style.display='block'; return; }
+  if (pass.length < 4) { errEl.textContent = 'Mot de passe trop court (4 caractères min.)'; errEl.style.display='block'; return; }
+  // Clé = username en minuscule sans espaces
+  const key = username.toLowerCase().replace(/\s+/g,'_');
+  try {
+    const existing = await dbGet(`users/${key}`);
+    if (existing) { errEl.textContent = 'Ce pseudo est déjà pris !'; errEl.style.display='block'; return; }
+    const hashed = await hashPassword(pass);
+    const combatCode = generateCombatCode();
+    const newUser = { username, password: hashed, combatCode, collection: {}, deck: [], createdAt: Date.now() };
+    await dbSet(`users/${key}`, newUser);
+    // Enregistrer le code de combat pour qu'on puisse retrouver le joueur par code
+    await dbSet(`codes/${combatCode}`, key);
+    await loginUser(key, newUser);
+  } catch(e) {
+    errEl.textContent = 'Erreur lors de la création du compte.';
+    errEl.style.display = 'block';
+    console.error(e);
+  }
+};
+
+window.doLogout = function() {
+  currentUser = null;
+  collection = {};
+  deck = [];
+  clearSession();
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+};
+
+// Restaurer session au chargement
+(async () => {
+  const savedUsername = loadSession();
+  if (savedUsername) {
+    try {
+      const userData = await dbGet(`users/${savedUsername}`);
+      if (userData) await loginUser(savedUsername, userData);
+      else clearSession();
+    } catch(e) { clearSession(); }
+  }
+})();
+
+// ===== TABS =====
+window.showTab = function(tab) {
+  document.querySelectorAll('.nav-tab').forEach((el,i) => {
+    el.classList.toggle('active', el.getAttribute('onclick').includes(`'${tab}'`));
+  });
+  document.querySelectorAll('.tab-content').forEach(el => {
+    el.classList.toggle('active', el.id === `tab-${tab}`);
+  });
+};
+
+// ===== BOOSTERS =====
+window.openBooster = function(ext) {
+  const cards = [];
+  for (let i=0; i<CARDS_PER_BOOSTER; i++) cards.push(randomCard(ext));
+  pendingCards = cards;
+
+  const overlay = document.getElementById('booster-overlay');
+  const row = document.getElementById('cards-reveal-row');
+  const collectBtn = document.getElementById('btn-collect');
+  const title = document.getElementById('reveal-title');
+
+  row.innerHTML = '';
+  collectBtn.classList.remove('visible');
+  title.textContent = '✦ Touche les cartes pour les révéler !';
+  overlay.classList.add('active');
+
+  let revealedCount = 0;
+  cards.forEach((cid, idx) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'reveal-card';
+    wrap.style.animationDelay = `${idx*0.1}s`;
+    wrap.innerHTML = `
+      <div class="card-face card-back">SCG</div>
+      <div class="card-face card-front">
+        <img src="${cardImgSrc(cid)}" alt="${cid}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="card-img-placeholder" style="display:none">
+          <span class="card-type-icon">${TYPE_ICONS[parseCardId(cid).type]}</span>
+          <span class="card-num">${cid}</span>
+        </div>
+      </div>
+    `;
+    wrap.addEventListener('click', () => {
+      if (wrap.classList.contains('flipped')) return;
+      wrap.classList.add('flipped');
+      revealedCount++;
+      if (revealedCount === cards.length) {
+        title.textContent = '✦ Toutes les cartes révélées !';
+        collectBtn.classList.add('visible');
+      }
+    });
+    row.appendChild(wrap);
+  });
+};
+
+window.collectCards = async function() {
+  if (!currentUser || !pendingCards.length) return;
+  const newColl = { ...collection };
+  for (const cid of pendingCards) {
+    newColl[cid] = (newColl[cid] || 0) + 1;
+  }
+  collection = newColl;
+  const key = currentUser.username.toLowerCase().replace(/\s+/g,'_');
+  await dbUpdate(`users/${key}`, { collection });
+  document.getElementById('booster-overlay').classList.remove('active');
+  pendingCards = [];
+  renderCollection();
+  renderDeckCollection();
+  showToast('✦ Cartes ajoutées à ta collection !');
+};
+
+// ===== COLLECTION RENDER =====
+window.filterColl = function(dim, val, el) {
+  const group = el.getAttribute('data-group');
+  const selector = group ? `[data-group="${group}"]` : `.filter-bar:first-of-type .filter-btn:not([data-group])`;
+  if (group) {
+    document.querySelectorAll(`#tab-collection .filter-btn[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
+  } else {
+    document.querySelectorAll('#tab-collection .filter-btn:not([data-group])').forEach(b => b.classList.remove('active'));
+  }
+  el.classList.add('active');
+  if (dim === 'ext') collFilterExt = val;
+  if (dim === 'type') collFilterType = val;
+  renderCollection();
+};
+
+function renderCollection() {
+  const container = document.getElementById('collection-grid');
+  const exts = collFilterExt === 'all' ? EXTENSIONS : [collFilterExt];
+  const types = collFilterType === 'all' ? TYPES : [collFilterType];
+
+  let html = '';
+  let totalOwned = 0;
+  for (const ext of exts) {
+    let cardsHtml = '';
+    let extCount = 0;
+    for (const type of types) {
+      const max = CARDS_PER_EXT[ext][type];
+      for (let n=1; n<=max; n++) {
+        const cid = cardId(ext, type, n);
+        const count = collection[cid] || 0;
+        if (count === 0) continue;
+        extCount++;
+        totalOwned++;
+        cardsHtml += `
+          <div class="coll-card">
+            <img src="${cardImgSrc(cid)}" alt="${cid}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="card-placeholder" style="display:none"><span class="type-icon">${TYPE_ICONS[type]}</span><span style="font-size:9px;color:var(--gold);font-family:'Cinzel',serif">${cid}</span></div>
+            ${count > 1 ? `<div class="card-count-badge">×${count}</div>` : ''}
+          </div>`;
+      }
+    }
+    if (cardsHtml) {
+      html += `
+        <div class="ext-section">
+          <div class="ext-header">
+            <span class="ext-badge">${ext}</span>
+            <span class="ext-title">${EXT_NAMES[ext]}</span>
+            <span class="ext-count">${extCount} carte${extCount>1?'s':''}</span>
+          </div>
+          <div class="cards-grid">${cardsHtml}</div>
+        </div>`;
+    }
+  }
+
+  if (!html) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h3>Collection vide</h3>
+        <p>Ouvre des boosters pour commencer ta collection !</p>
+      </div>`;
+  } else {
+    container.innerHTML = html;
+  }
+}
+
+// ===== DECK RENDER =====
+window.filterDeck = function(dim, val, el) {
+  const group = el.getAttribute('data-group');
+  if (group) {
+    document.querySelectorAll(`#tab-deck .filter-btn[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
+  } else {
+    document.querySelectorAll('#tab-deck .filter-btn:not([data-group])').forEach(b => b.classList.remove('active'));
+  }
+  el.classList.add('active');
+  if (dim === 'ext') deckFilterExt = val;
+  if (dim === 'type') deckFilterType = val;
+  renderDeckCollection();
+};
+
+function deckCopiesOf(cid) { return deck.filter(id => id === cid).length; }
+
+function renderDeckCollection() {
+  const container = document.getElementById('deck-collection-grid');
+  const exts = deckFilterExt === 'all' ? EXTENSIONS : [deckFilterExt];
+  const types = deckFilterType === 'all' ? TYPES : [deckFilterType];
+  let html = '';
+  for (const ext of exts) {
+    let cardsHtml = '';
+    for (const type of types) {
+      const max = CARDS_PER_EXT[ext][type];
+      for (let n=1; n<=max; n++) {
+        const cid = cardId(ext, type, n);
+        const count = collection[cid] || 0;
+        if (count === 0) continue;
+        const inDeckCount = deckCopiesOf(cid);
+        const isMaxed = inDeckCount >= MAX_COPIES || deck.length >= MAX_DECK;
+        const inDeck = inDeckCount > 0;
+        cardsHtml += `
+          <div class="coll-card${inDeck?' in-deck':''}${isMaxed?' maxed':''}">
+            <img src="${cardImgSrc(cid)}" alt="${cid}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="card-placeholder" style="display:none"><span class="type-icon">${TYPE_ICONS[type]}</span><span style="font-size:9px;color:var(--gold);font-family:'Cinzel',serif">${cid}</span></div>
+            ${inDeckCount > 0 ? `<div class="card-count-badge">×${inDeckCount}</div>` : ''}
+            <button class="add-to-deck-btn" onclick="addToDeck('${cid}')">${isMaxed ? '✗ Max' : '+ Deck'}</button>
+          </div>`;
+      }
+    }
+    if (cardsHtml) {
+      html += `
+        <div class="ext-section" style="margin-bottom:20px;">
+          <div class="ext-header">
+            <span class="ext-badge">${ext}</span>
+            <span class="ext-title">${EXT_NAMES[ext]}</span>
+          </div>
+          <div class="cards-grid">${cardsHtml}</div>
+        </div>`;
+    }
+  }
+  if (!html) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><h3>Aucune carte</h3><p>Ouvre des boosters !</p></div>`;
+  } else {
+    container.innerHTML = html;
+  }
+}
+
+function renderDeckSlots() {
+  const container = document.getElementById('deck-slots');
+  container.innerHTML = '';
+  for (let i=0; i<MAX_DECK; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'deck-slot';
+    if (i < deck.length) {
+      const cid = deck[i];
+      slot.classList.add('filled');
+      slot.innerHTML = `
+        <div class="deck-card-wrap">
+          <img src="${cardImgSrc(cid)}" alt="${cid}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="slot-placeholder card-placeholder" style="display:none;width:80px;height:112px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);">
+            <span class="type-icon">${TYPE_ICONS[parseCardId(cid).type]}</span>
+          </div>
+          <button class="deck-remove-btn" onclick="removeFromDeck(${i})">✕</button>
+        </div>`;
+    } else {
+      slot.textContent = '✦';
+    }
+    container.appendChild(slot);
+  }
+  const pct = (deck.length / MAX_DECK) * 100;
+  document.getElementById('deck-count-text').textContent = `${deck.length}/${MAX_DECK}`;
+  document.getElementById('deck-count-fill').style.width = pct + '%';
+}
+
+window.addToDeck = function(cid) {
+  if (deck.length >= MAX_DECK) { showToast('⚠️ Deck complet (25 cartes max) !'); return; }
+  if (deckCopiesOf(cid) >= MAX_COPIES) { showToast('⚠️ 2 exemplaires maximum par carte !'); return; }
+  deck.push(cid);
+  renderDeckSlots();
+  renderDeckCollection();
+};
+
+window.removeFromDeck = function(idx) {
+  deck.splice(idx, 1);
+  renderDeckSlots();
+  renderDeckCollection();
+};
+
+window.saveDeck = async function() {
+  if (!currentUser) return;
+  const key = currentUser.username.toLowerCase().replace(/\s+/g,'_');
+  await dbUpdate(`users/${key}`, { deck });
+  checkDeckForCombat();
+  showToast('✦ Deck sauvegardé avec succès !');
+};
+
+// ===== COMBAT =====
+function checkDeckForCombat() {
+  const warn = document.getElementById('no-deck-warn');
+  warn.style.display = deck.length < MAX_DECK ? 'flex' : 'none';
+}
+
+window.copyCode = function() {
+  const code = document.getElementById('combat-code').textContent;
+  navigator.clipboard.writeText(code).then(() => showToast('✦ Code copié dans le presse-papier !'));
+};
+
+window.startDuel = async function() {
+  if (deck.length < MAX_DECK) {
+    showToast('⚠️ Tu dois avoir un deck de 25 cartes !');
+    return;
+  }
+  const enemyCode = document.getElementById('enemy-code').value.trim().toUpperCase();
+  if (!enemyCode || enemyCode.length < 4) {
+    showToast('⚠️ Entre le code de ton adversaire !');
+    return;
+  }
+  if (enemyCode === currentUser?.combatCode) {
+    showToast('⚠️ Tu ne peux pas te battre contre toi-même !');
+    return;
+  }
+  showToast('🔍 Recherche de l\'adversaire... (fonctionnalité combat à venir !)');
+  document.getElementById('combat-status').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('combat-status').style.display = 'none';
+    showToast('⚔️ Système de combat en cours de développement !', 3500);
+  }, 2500);
+};
+
+// ===== EXPOSE GLOBALS =====
+window.openBooster = window.openBooster;
+window.collectCards = window.collectCards;
+window.showTab = window.showTab;
+window.filterColl = window.filterColl;
+window.filterDeck = window.filterDeck;
+window.addToDeck = window.addToDeck;
+window.removeFromDeck = window.removeFromDeck;
+window.saveDeck = window.saveDeck;
+window.copyCode = window.copyCode;
+window.startDuel = window.startDuel;
+window.doLogin = window.doLogin;
+window.doRegister = window.doRegister;
+window.doLogout = window.doLogout;
+window.switchAuthTab = window.switchAuthTab;
+
+</script>
+</body>
+</html>

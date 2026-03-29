@@ -2899,15 +2899,12 @@ function renderBoard() {
 
   if (!myState && duelRole !== 'spectator') return;
 
-  // Ma main
   renderHand('my-hand', myState?.hand || [], false);
-  // Main adversaire masquée
   renderHand('enemy-hand', enemyState?.hand || [], true);
 
-  // Plateau
   const rows = ['perso','objet','piege'];
   for (const row of rows) {
-    for (let i=0; i<3; i++) {
+    for (let i = 0; i < 3; i++) {
       const mySlot = document.querySelector(`#my-board .board-slot[data-row="${row}"][data-slot="${i}"]`);
       const enemySlot = document.querySelector(`#enemy-board .board-slot[data-row="${row}"][data-slot="${i}"]`);
       if (mySlot) renderSlot(mySlot, myState?.board?.[row]?.[i], true);
@@ -2915,13 +2912,19 @@ function renderBoard() {
     }
   }
 
-  // Decks et cimetières
+  // Si on est en mode placement, ré-activer les slots cibles après le re-render
+  if (duelPickingSlot) {
+    document.querySelectorAll('#my-board .board-slot').forEach(slot => {
+      slot.classList.add('slot-target');
+      slot.onclick = () => placePendingCard(slot);
+    });
+  }
+
   updatePile('my-deck-count', myState?.deck?.length || 0);
   updatePile('enemy-deck-count', enemyState?.deck?.length || 0);
   updatePile('my-cemetery-count', myState?.cemetery?.length || 0);
   updatePile('enemy-cemetery-count', enemyState?.cemetery?.length || 0);
 
-  // Dessus du cimetière
   const myCemTop = myState?.cemetery?.at(-1);
   const enemyCemTop = enemyState?.cemetery?.at(-1);
   const myCemEl = document.getElementById('my-cemetery-top');
@@ -2960,7 +2963,13 @@ function renderHand(containerId, hand, hidden) {
 
 function renderSlot(el, cardData, isMe) {
   el.innerHTML = '';
-  if (!cardData) return;
+  // Réinitialiser le onclick (sera réassigné par startPlacement si besoin)
+  el.onclick = null;
+
+  if (!cardData) {
+    // Slot vide — le onclick sera géré par startPlacement via slot-target
+    return;
+  }
 
   const div = document.createElement('div');
   const isHidden = cardData.mode === 'hidden';
@@ -2979,11 +2988,6 @@ function renderSlot(el, cardData, isMe) {
   }
 
   el.appendChild(div);
-
-  // Clic sur emplacement vide pour y placer une carte
-  if (!cardData && isMe) {
-    el.onclick = () => placePendingCard(el);
-  }
 }
 
 // ===== INTERACTIONS MAIN =====
@@ -3209,7 +3213,8 @@ window.pickFromCemetery = async function(idx) {
 
 // ===== MODAL HELPERS =====
 window.closeDuelModal = function(e) {
-  if (e && e.target !== document.getElementById('duel-card-modal')) return;
+  // Si appelé avec un event (clic sur le fond), ne fermer que si clic sur le fond lui-même
+  if (e instanceof Event && e.target !== document.getElementById('duel-card-modal')) return;
   document.getElementById('duel-card-modal').classList.remove('active');
   if (!duelPickingSlot) duelPendingCard = null;
 };

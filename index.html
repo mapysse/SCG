@@ -1635,14 +1635,155 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
 
   /* ===== RESPONSIVE ===== */
+  /* ===== RESPONSIVE MOBILE ===== */
   @media (max-width: 768px) {
-    :root { --card-w: 88px; --card-h: 124px; }
-    .deck-layout { grid-template-columns: 1fr; }
-    .booster-row { gap: 16px; }
-    .booster-card { width: 160px; }
-    .nav-tab { padding: 8px 14px; font-size: 11px; }
-    header { padding: 0 12px; }
-    .tab-content { padding: 20px 12px; }
+
+    /* Variables cartes plus petites */
+    :root {
+      --card-w: 80px;
+      --card-h: 112px;
+    }
+
+    /* Header */
+    header { padding: 0 12px; height: 52px; }
+    .header-logo { font-size: 14px; }
+    .header-user { font-size: 11px; gap: 8px; }
+    .btn-logout { padding: 4px 10px; font-size: 10px; }
+
+    /* Nav - icônes seulement sur très petit */
+    nav { padding: 6px 8px; gap: 2px; }
+    .nav-tab { padding: 7px 10px; font-size: 10px; letter-spacing: 0.5px; }
+    .nav-tab.active::after { bottom: -7px; }
+
+    /* Tab content */
+    .tab-content { padding: 16px 10px; }
+
+    /* ---- BOOSTERS ---- */
+    .booster-arena { padding: 0; }
+    .booster-row { gap: 12px; justify-content: center; }
+    .booster-card { width: 140px; padding: 16px 12px 14px; }
+    .booster-img-wrap { width: 110px; height: 177px; }
+    .booster-name { font-size: 15px; }
+    .booster-desc { font-size: 11px; margin-bottom: 10px; }
+    .btn-open-booster { font-size: 11px; padding: 8px; }
+
+    /* ---- COLLECTION ---- */
+    .filter-bar { gap: 5px; }
+    .filter-btn { padding: 5px 12px; font-size: 11px; }
+    .filter-label { font-size: 10px; }
+    .cards-grid { gap: 8px; }
+    .ext-title { font-size: 13px; }
+
+    /* Modal carte agrandie */
+    .modal-card-wrap { width: 200px; height: 280px; }
+    #card-modal .modal-inner { gap: 14px; }
+    .modal-counts { font-size: 11px; gap: 12px; }
+
+    /* ---- DECK ---- */
+    #tab-deck { padding-right: 0 !important; }
+
+    /* Panneau deck : fixe en bas sur mobile */
+    #deck-fixed-panel {
+      top: auto !important;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: auto;
+      max-height: 42vh;
+      border-left: none;
+      border-top: 1px solid var(--border);
+      border-radius: 16px 16px 0 0;
+      padding: 12px 12px 16px;
+      overflow-y: auto;
+    }
+
+    .deck-slots {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+    }
+
+    /* Espace sous la collection pour que le panel deck ne couvre pas */
+    #tab-deck .deck-layout { padding-bottom: 44vh; }
+
+    /* ---- COMBAT LOBBY ---- */
+    .combat-center { padding: 0; }
+    .combat-box { padding: 20px 16px; }
+    .combat-title { font-size: 15px; }
+    .combat-enter { flex-direction: column; gap: 8px; }
+    .combat-enter input { font-size: 14px; padding: 11px; }
+    .btn-duel { width: 100%; text-align: center; }
+
+    /* ---- PLATEAU DE JEU ---- */
+    #combat-board {
+      max-width: 100%;
+      gap: 6px;
+      padding: 0 4px 12px;
+    }
+
+    #duel-status-bar {
+      padding: 8px 12px;
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+
+    #duel-code-display { font-size: 12px; letter-spacing: 2px; }
+
+    .player-zone { padding: 8px; gap: 5px; }
+
+    /* Slots plus petits sur mobile */
+    .board-slot { width: 62px; height: 87px; border-radius: 7px; }
+    .board-row { gap: 4px; justify-content: center; }
+    .board-label { width: 38px; font-size: 9px; padding-right: 4px; }
+
+    /* Main : cartes plus petites et défilables */
+    .hand-row {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      gap: 4px;
+      padding: 4px 0 8px;
+      justify-content: flex-start;
+    }
+
+    .hand-card { width: 52px; height: 73px; flex-shrink: 0; }
+    .hand-card:hover { transform: translateY(-6px); }
+
+    /* Deck/cimetière */
+    .deck-cemetery-row { gap: 8px; }
+    .mini-pile { width: 52px; }
+    .mini-pile-img { width: 52px; height: 73px; }
+    .mini-pile-count { font-size: 10px; }
+
+    /* Modal duel */
+    .duel-modal-inner {
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .duel-modal-card { width: 140px; height: 196px; }
+    .duel-action-btn { padding: 10px 12px; font-size: 13px; }
+
+    /* Hint placement */
+    .slot-pick-hint { font-size: 11px; padding: 10px 20px; bottom: 16px; }
+
+    /* Auth */
+    .auth-box { width: 92vw; padding: 32px 20px; }
+    .auth-logo h1 { font-size: 18px; }
+  }
+
+  /* Très petit écran (iPhone SE etc.) */
+  @media (max-width: 380px) {
+    .nav-tab { padding: 6px 7px; font-size: 9px; }
+    .board-slot { width: 54px; height: 76px; }
+    .hand-card { width: 46px; height: 64px; }
+    .mini-pile { width: 46px; }
+    .mini-pile-img { width: 46px; height: 64px; }
+    .booster-card { width: 120px; }
+    .booster-img-wrap { width: 95px; height: 153px; }
   }
 </style>
 </head>
@@ -3387,8 +3528,8 @@ window.closeDuelModal = function(e) {
 };
 
 window.copyCode = function() {
-  const code = document.getElementById('combat-code');
-  if (code) navigator.clipboard.writeText(code.textContent).then(() => showToast('✦ Code copié !'));
+  const code = document.getElementById('duel-code-display');
+  if (code) navigator.clipboard.writeText(code.textContent.replace('⚔ ','')).then(() => showToast('✦ Code copié !'));
 };
 
 

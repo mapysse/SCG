@@ -1859,7 +1859,7 @@
 <!-- Firebase SDKs -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, set, update, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBl6tzfUNRv1BaUc7ftnOKVug3l7UsjG2A",
@@ -1871,8 +1871,13 @@ const firebaseConfig = {
   appId: "1:658409580326:web:146ffe1a16bdd2a05983e7"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+let app, db;
+try {
+  app = initializeApp(firebaseConfig);
+  db = getDatabase(app);
+} catch(e) {
+  console.error('Firebase init error:', e);
+}
 
 // Hash SHA-256 du mot de passe (jamais stocké en clair)
 async function hashPassword(password) {
@@ -2024,7 +2029,6 @@ async function loginUser(username, data) {
   }
   saveSession(username);
   document.getElementById('header-username').textContent = data.username;
-  document.getElementById('combat-code').textContent = data.combatCode || '------';
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   renderCollection();
@@ -2065,7 +2069,7 @@ window.doRegister = async function() {
     if (existing) { errEl.textContent = 'Ce pseudo est déjà pris !'; errEl.style.display='block'; return; }
     const hashed = await hashPassword(pass);
     const combatCode = generateCombatCode();
-    const newUser = { username, password: hashed, combatCode, collection: {}, deck: [], createdAt: Date.now() };
+    const newUser = { username, password: hashed, combatCode, collection: {}, decks: { 1: [], 2: [], 3: [] }, createdAt: Date.now() };
     await dbSet(`users/${key}`, newUser);
     // Enregistrer le code de combat pour qu'on puisse retrouver le joueur par code
     await dbSet(`codes/${combatCode}`, key);
@@ -2080,7 +2084,7 @@ window.doRegister = async function() {
 window.doLogout = function() {
   currentUser = null;
   collection = {};
-  deck = [];
+  decks = { 1: [], 2: [], 3: [] };
   clearSession();
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
@@ -2605,14 +2609,9 @@ function renderCollection() {
 }
 
 // ===== DECK RENDER =====
-let currentDeckIdx = 1; // 1, 2 ou 3
-// decks est un objet { 1: [...], 2: [...], 3: [...] }
+let currentDeckIdx = 1;
 let decks = { 1: [], 2: [], 3: [] };
-// deck pointe toujours sur le deck courant
-Object.defineProperty(window, 'deck', {
-  get: () => decks[currentDeckIdx],
-  set: (v) => { decks[currentDeckIdx] = v; }
-});
+function currentDeck() { return decks[currentDeckIdx]; }
 
 window.switchDeck = function(idx, btn) {
   currentDeckIdx = idx;
@@ -2839,8 +2838,7 @@ window.joinDuel = async function() {
   document.getElementById('duel-role-display').textContent = duelRole === 'spectator' ? '👁 SPECTATEUR' : duelRole === 'p1' ? '🛡 Joueur 1' : '⚔ Joueur 2';
 
   // Écoute en temps réel
-  const { onValue, ref: fbRef } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
-  duelUnsub = onValue(fbRef(db, `duels/${code}`), snap => {
+  duelUnsub = onValue(ref(db, `duels/${code}`), snap => {
     if (!snap.exists()) return;
     duelState = snap.val();
     renderBoard();
@@ -3191,25 +3189,11 @@ window.closeDuelModal = function(e) {
   if (!duelPickingSlot) duelPendingCard = null;
 };
 
-// ===== EXPOSE GLOBALS =====
-window.joinDuel = window.joinDuel;
-window.leaveDuel = window.leaveDuel;
-window.openDeckMenu = window.openDeckMenu;
-window.openCemeteryMenu = window.openCemeteryMenu;
-window.openBooster = window.openBooster;
-window.collectCards = window.collectCards;
-window.showTab = window.showTab;
-window.filterColl = window.filterColl;
-window.filterDeck = window.filterDeck;
-window.addToDeck = window.addToDeck;
-window.removeFromDeck = window.removeFromDeck;
-window.saveDeck = window.saveDeck;
-window.copyCode = window.copyCode;
-window.startDuel = window.startDuel;
-window.doLogin = window.doLogin;
-window.doRegister = window.doRegister;
-window.doLogout = window.doLogout;
-window.switchAuthTab = window.switchAuthTab;
+window.copyCode = function() {
+  const code = document.getElementById('combat-code');
+  if (code) navigator.clipboard.writeText(code.textContent).then(() => showToast('✦ Code copié !'));
+};
+
 
 </script>
 </body>

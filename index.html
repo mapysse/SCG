@@ -1349,16 +1349,26 @@
   }
 
   /* ===== COMBAT BOARD ===== */
-  #combat-board { display: flex; flex-direction: column; gap: 0; max-width: 900px; margin: 0 auto; user-select: none; }
+  #combat-board {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 780px;
+    margin: 0 auto;
+    user-select: none;
+    padding-bottom: 20px;
+  }
 
   #duel-status-bar {
     display: flex; align-items: center; justify-content: space-between;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 16px; margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--surface2), var(--surface3));
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 18px; margin-bottom: 8px;
     font-family: 'Cinzel', serif; font-size: 13px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
   }
 
-  #duel-code-display { color: var(--gold); letter-spacing: 3px; font-weight: 700; }
+  #duel-code-display { color: var(--gold); letter-spacing: 3px; font-weight: 700; font-size: 14px; }
   #duel-role-display { color: var(--text-muted); font-size: 11px; letter-spacing: 2px; }
 
   .btn-leave-duel {
@@ -1366,116 +1376,215 @@
     border-radius: 6px; padding: 5px 12px; color: #e74c3c;
     font-size: 11px; font-family: 'Raleway', sans-serif; cursor: pointer; transition: all 0.25s;
   }
-
   .btn-leave-duel:hover { background: rgba(231,76,60,0.3); }
 
-  .player-zone { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: rgba(255,255,255,0.015); border-radius: 12px; border: 1px solid rgba(255,255,255,0.04); }
-  .my-zone { flex-direction: column-reverse; }
-
-  .zone-label { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
-
-  .board-grid { display: flex; flex-direction: column; gap: 6px; }
-
-  .board-row { display: flex; align-items: center; gap: 6px; }
-
-  .board-label { font-size: 10px; color: var(--text-muted); font-family: 'Cinzel', serif; letter-spacing: 1px; width: 56px; flex-shrink: 0; text-align: right; padding-right: 6px; }
-
-  .board-slot {
-    width: 82px; height: 115px;
-    border: 1px dashed rgba(201,168,76,0.18); border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: rgba(201,168,76,0.08);
-    position: relative; flex-shrink: 0;
-    transition: border-color 0.25s, background 0.25s; cursor: pointer;
+  /* Zone joueur */
+  .player-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005));
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
   }
 
-  .board-slot[data-owner="me"]:hover { border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.04); }
-  .board-slot.slot-target { border-color: var(--gold) !important; background: rgba(201,168,76,0.1) !important; animation: slot-pulse 0.8s ease-in-out infinite; }
+  .enemy-zone { border-color: rgba(231,76,60,0.12); background: linear-gradient(160deg, rgba(231,76,60,0.04), rgba(255,255,255,0.005)); }
+  .my-zone { border-color: rgba(201,168,76,0.12); background: linear-gradient(160deg, rgba(201,168,76,0.04), rgba(255,255,255,0.005)); flex-direction: column-reverse; }
 
-  @keyframes slot-pulse { 0%,100%{border-color:rgba(201,168,76,0.5)} 50%{border-color:var(--gold)} }
+  .zone-label {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 3px;
+    color: var(--text-muted); text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
 
-  .board-card { width: 100%; height: 100%; border-radius: 7px; overflow: hidden; position: relative; cursor: pointer; }
+  .zone-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  /* Grille centrale */
+  .board-grid { display: flex; flex-direction: column; gap: 5px; }
+
+  .board-row {
+    display: flex; align-items: center; gap: 5px;
+    justify-content: center;
+  }
+
+  .board-label {
+    font-size: 9px; color: rgba(255,255,255,0.2); font-family: 'Cinzel', serif;
+    letter-spacing: 1px; width: 48px; flex-shrink: 0; text-align: right; padding-right: 6px;
+  }
+
+  /* Slots */
+  .board-slot {
+    width: 88px; height: 123px;
+    border: 1px dashed rgba(201,168,76,0.15); border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: rgba(201,168,76,0.07);
+    position: relative; flex-shrink: 0;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    background: rgba(0,0,0,0.15);
+  }
+
+  .board-slot[data-owner="me"]:hover {
+    border-color: rgba(201,168,76,0.35);
+    background: rgba(201,168,76,0.04);
+  }
+
+  .board-slot.slot-target {
+    border-color: var(--gold) !important;
+    background: rgba(201,168,76,0.08) !important;
+    box-shadow: 0 0 12px rgba(201,168,76,0.25), inset 0 0 8px rgba(201,168,76,0.08);
+    animation: slot-pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes slot-pulse {
+    0%,100% { box-shadow: 0 0 8px rgba(201,168,76,0.2); }
+    50% { box-shadow: 0 0 20px rgba(201,168,76,0.45); }
+  }
+
+  .board-card { width: 100%; height: 100%; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; }
   .board-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.2s; }
-  .board-card:hover img { filter: brightness(0.75); }
-  .board-card.rotated-90 { transform: rotate(90deg); width: 115px; height: 82px; margin: auto; }
+  .board-card:hover img { filter: brightness(0.7); }
+  .board-card.rotated-90 {
+    transform: rotate(90deg);
+    width: 123px; height: 88px;
+    position: absolute; top: 50%; left: 50%;
+    margin: 0;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
 
-  .hand-row { display: flex; gap: 6px; flex-wrap: wrap; min-height: 100px; padding: 6px 0; }
+  /* Main */
+  .hand-row {
+    display: flex; gap: 5px; flex-wrap: wrap;
+    min-height: 88px; padding: 4px 0;
+    justify-content: center;
+  }
 
   .hand-card {
-    width: 68px; height: 95px; border-radius: 7px; overflow: hidden;
-    border: 1px solid var(--border); cursor: pointer; position: relative;
-    flex-shrink: 0; transition: transform 0.2s;
+    width: 62px; height: 87px; border-radius: 7px; overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.2); cursor: pointer; position: relative;
+    flex-shrink: 0; transition: transform 0.2s, box-shadow 0.2s;
+    background: var(--surface2);
   }
 
-  .hand-card:hover { transform: translateY(-8px); z-index: 5; }
+  .hand-card:hover { transform: translateY(-10px); z-index: 5; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
   .hand-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   .hand-card.hidden-card {
-    background: linear-gradient(145deg, #10102a, #1c1c40);
-    border: 1px solid rgba(201,168,76,0.3);
+    background: linear-gradient(145deg, #10102a, #1a1a35);
+    border: 1px solid rgba(201,168,76,0.2);
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: rgba(201,168,76,0.3); cursor: default;
+    cursor: default;
+  }
+  .hand-card.hidden-card img { opacity: 0.6; }
+  .hand-card.hidden-card:hover { transform: none; box-shadow: none; }
+
+  /* Deck + Cimetière */
+  .deck-cemetery-row {
+    display: flex; gap: 10px; align-items: center;
+    justify-content: flex-end;
+    padding-right: 4px;
   }
 
-  .hand-card.hidden-card:hover { transform: none; }
+  .my-zone .deck-cemetery-row { justify-content: flex-start; padding-right: 0; padding-left: 4px; }
 
-  .deck-cemetery-row { display: flex; gap: 12px; align-items: center; }
-
-  .mini-pile { width: 68px; text-align: center; cursor: pointer; transition: transform 0.2s; }
+  .mini-pile { width: 62px; text-align: center; cursor: pointer; transition: transform 0.2s; }
   .mini-pile:hover { transform: translateY(-3px); }
 
   .mini-pile-img {
-    width: 68px; height: 95px; border-radius: 7px; overflow: hidden;
-    border: 1px solid var(--border); background: var(--surface2);
-    display: flex; align-items: center; justify-content: center; position: relative;
+    width: 62px; height: 87px; border-radius: 7px; overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.2); background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    position: relative;
   }
 
   .mini-pile-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .cemetery-pile .mini-pile-img { border-color: rgba(231,76,60,0.3); }
-  .mini-pile-count { font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold); margin-top: 3px; font-weight: 700; }
+  .cemetery-pile .mini-pile-img { border-color: rgba(231,76,60,0.25); }
+  .mini-pile-count { font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold); margin-top: 3px; font-weight: 700; }
   .mini-pile-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-family: 'Cinzel', serif; }
 
-  .board-separator { padding: 6px 0; display: flex; align-items: center; }
-  .separator-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
+  /* Séparateur */
+  .board-separator {
+    display: flex; align-items: center; gap: 12px;
+    padding: 2px 0;
+  }
 
-  /* Modal contextuel duel */
+  .separator-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent); }
+
+  .separator-icon {
+    font-size: 16px;
+    color: rgba(201,168,76,0.2);
+    font-family: 'Cinzel', serif;
+  }
+
+  /* Modal duel */
   #duel-card-modal {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-    z-index: 700; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    z-index: 700; display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.15s ease;
   }
 
   #duel-card-modal.active { display: flex; }
 
   .duel-modal-inner {
     background: linear-gradient(145deg, var(--surface2), var(--surface));
-    border: 1px solid var(--border); border-radius: 16px; padding: 24px;
-    display: flex; gap: 20px; align-items: flex-start; max-width: 480px; width: 90%;
+    border: 1px solid var(--border); border-radius: 18px; padding: 22px;
+    display: flex; gap: 18px; align-items: flex-start;
+    max-width: 440px; width: 92%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    position: relative;
   }
 
-  .duel-modal-card { width: 110px; height: 154px; border-radius: 10px; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border); }
+  .duel-modal-inner::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    border-radius: 18px 18px 0 0;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .duel-modal-card {
+    width: 100px; height: 140px; border-radius: 9px; overflow: hidden;
+    flex-shrink: 0; border: 1px solid rgba(201,168,76,0.3);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
   .duel-modal-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  .duel-modal-actions { display: flex; flex-direction: column; gap: 7px; flex: 1; }
+  .duel-modal-actions { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
 
-  .duel-modal-title { font-family: 'Cinzel', serif; font-size: 12px; color: var(--gold); letter-spacing: 1px; margin-bottom: 4px; }
+  .duel-modal-title {
+    font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold);
+    letter-spacing: 2px; margin-bottom: 6px; text-transform: uppercase;
+  }
 
   .duel-action-btn {
-    background: var(--surface3); border: 1px solid var(--border); border-radius: 8px;
-    padding: 8px 12px; color: var(--text); font-family: 'Raleway', sans-serif;
-    font-size: 12px; cursor: pointer; text-align: left; transition: all 0.2s;
+    background: var(--surface3); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: 'Raleway', sans-serif; font-size: 12px; cursor: pointer;
+    text-align: left; transition: all 0.2s; width: 100%;
   }
 
   .duel-action-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+  .duel-action-btn.danger { border-color: rgba(231,76,60,0.15); }
   .duel-action-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(231,76,60,0.08); }
 
-  .duel-action-btn-close { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; text-align: center; padding: 4px; font-family: 'Raleway', sans-serif; margin-top: 2px; }
+  .duel-action-btn-close {
+    background: none; border: none; color: var(--text-muted); font-size: 11px;
+    cursor: pointer; text-align: center; padding: 4px;
+    font-family: 'Raleway', sans-serif; margin-top: 2px; width: 100%;
+  }
+  .duel-action-btn-close:hover { color: var(--text); }
 
   .slot-pick-hint {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: var(--gold); color: var(--deep); font-family: 'Cinzel', serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 2px;
-    padding: 12px 28px; border-radius: 30px; z-index: 600;
-    display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--deep); font-family: 'Cinzel', serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 2px;
+    padding: 12px 30px; border-radius: 30px; z-index: 600;
+    display: none; box-shadow: 0 8px 30px rgba(201,168,76,0.4);
+    animation: fadeIn 0.3s ease;
   }
 
   .slot-pick-hint.active { display: block; }
@@ -1744,7 +1853,7 @@
       </div>
 
       <!-- Séparateur -->
-      <div class="board-separator"><div class="separator-line"></div></div>
+      <div class="board-separator"><div class="separator-line"></div><div class="separator-icon">⚔</div><div class="separator-line"></div></div>
 
       <!-- Zone joueur (en bas) -->
       <div class="player-zone my-zone" id="my-zone">
@@ -2994,16 +3103,25 @@ function renderSlot(el, cardData, isMe) {
 function openHandCardModal(cid, idx) {
   if (duelRole === 'spectator') return;
   duelPendingCard = { cid, source: 'hand', sourceIdx: idx };
-  const img = document.getElementById('duel-modal-img');
-  img.src = cardImgSrc(cid);
+  document.getElementById('duel-modal-img').src = cardImgSrc(cid);
   document.getElementById('duel-modal-title').textContent = 'Carte en main';
   document.getElementById('duel-modal-btns').innerHTML = `
-    <button class="duel-action-btn" onclick="startPlacement('attack')">⚔ Poser en attaque</button>
-    <button class="duel-action-btn" onclick="startPlacement('defense')">🛡 Poser en défense (pivotée)</button>
-    <button class="duel-action-btn" onclick="startPlacement('hidden')">🎭 Poser face cachée (pivotée)</button>
+    <button class="duel-action-btn" onclick="startPlacement('attack')">⚔ Poser en attaque (normal)</button>
+    <button class="duel-action-btn" onclick="startPlacement('defense')">🛡 Poser en défense (pivoté 90°)</button>
+    <button class="duel-action-btn" onclick="startPlacement('hidden')">🎭 Poser face cachée (pivoté 90°)</button>
+    <button class="duel-action-btn danger" onclick="handToCemetery(${idx})">💀 Défausser au cimetière</button>
     <button class="duel-action-btn-close" onclick="closeDuelModal()">Annuler</button>`;
   document.getElementById('duel-card-modal').classList.add('active');
 }
+
+window.handToCemetery = async function(idx) {
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+  const [card] = state.hand.splice(idx, 1);
+  state.cemetery.push(card);
+  closeDuelModal();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+};
 
 window.startPlacement = function(mode) {
   duelPendingMode = mode;
@@ -3051,17 +3169,39 @@ async function placePendingCard(slotEl) {
 // ===== INTERACTIONS PLATEAU =====
 function openBoardCardModal(cardData, slotEl) {
   if (duelRole === 'spectator') return;
-  duelPendingCard = { cid: cardData.cid, source: 'board', slotEl };
-  const img = document.getElementById('duel-modal-img');
-  img.src = cardImgSrc(cardData.cid);
+  duelPendingCard = { cid: cardData.cid, source: 'board', slotEl, currentMode: cardData.mode };
+  document.getElementById('duel-modal-img').src = cardImgSrc(cardData.cid);
   document.getElementById('duel-modal-title').textContent = 'Carte sur le plateau';
+
+  // Options de changement de position (pas l'option actuelle)
+  const posOptions = [
+    { mode: 'attack',  label: '⚔ Passer en attaque (normal)' },
+    { mode: 'defense', label: '🛡 Passer en défense (pivoté 90°)' },
+    { mode: 'hidden',  label: '🎭 Retourner face cachée (pivoté 90°)' },
+  ].filter(o => o.mode !== cardData.mode)
+   .map(o => `<button class="duel-action-btn" onclick="changeBoardCardMode('${o.mode}')">${o.label}</button>`)
+   .join('');
+
   document.getElementById('duel-modal-btns').innerHTML = `
+    ${posOptions}
     <button class="duel-action-btn" onclick="moveBoardCard('hand')">✋ Remettre en main</button>
-    <button class="duel-action-btn" onclick="moveBoardCard('deck')">🔀 Remettre dans le deck (aléatoire)</button>
+    <button class="duel-action-btn" onclick="moveBoardCard('deck')">🔀 Remettre dans le deck</button>
     <button class="duel-action-btn danger" onclick="moveBoardCard('cemetery')">💀 Envoyer au cimetière</button>
     <button class="duel-action-btn-close" onclick="closeDuelModal()">Annuler</button>`;
   document.getElementById('duel-card-modal').classList.add('active');
 }
+
+window.changeBoardCardMode = async function(newMode) {
+  if (!duelPendingCard) return;
+  const myKey = duelRole === 'p1' ? 'p1State' : 'p2State';
+  const state = JSON.parse(JSON.stringify(duelState[myKey]));
+  const slotEl = duelPendingCard.slotEl;
+  const row = slotEl.getAttribute('data-row');
+  const idx = parseInt(slotEl.getAttribute('data-slot'));
+  state.board[row][idx] = { cid: duelPendingCard.cid, mode: newMode };
+  closeDuelModal();
+  await dbUpdate(`duels/${duelCode}`, { [myKey]: state });
+};
 
 window.moveBoardCard = async function(destination) {
   if (!duelPendingCard) return;
